@@ -1,6 +1,9 @@
 <H1>Rift</H1>
 The Official Download for Rift Menu.
 
+<H1>Leading</H1>
+- THIS MENU USES II'S STUPID MENU'S TEMPLATE TO HELP BUILD AND HOLD THE MENU, SPECIAL THANKS TO IIDK FOR THE FREE TEMPLATE USE.
+
 <H2>Overview</H2>
 Rift Menu is an open-source cheat menu designed for Gorilla Tag. It is built with performance in mind, offering a compact and lightweight experience that has minimal impact on the game's framerate. The menu provides a variety of cheats and modifications to enhance or alter gameplay, and it is free to use.
 
