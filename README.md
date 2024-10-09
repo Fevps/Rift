@@ -21,7 +21,7 @@ Rift Menu is an open-source cheat menu designed for Gorilla Tag. It is built wit
 Mods/mods.cs Remake, Gun Library Remake, Menu Layout Remake, Main.cs Remake
 
 <H2>Installation</H2>
-1. Download the menu from the Rift repository: https://github.com/Fevps/Rift
+1. Download the menu from the Rift repository: https://github.com/Fevps/Rift/releases/tag/gtag
 2. Download/Locate BepInEx and create/locate your plugins within BepInEx, and move Rift.dll into it
 3. Launch Gorilla Tag.
 
