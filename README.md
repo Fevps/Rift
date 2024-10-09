@@ -1,11 +1,19 @@
-<H1>Rift</H1>
-The Official Download for Rift Menu.
+<H1>Rift, Overview</H1>
+Rift Menu is an open-source fully undetected cheat menu designed for Gorilla Tag. It is built with performance in mind, offering a compact and lightweight experience that has minimal impact on the game's framerate. The menu provides a variety of cheats and modifications to enhance or alter gameplay, and it is free to use.
 
-<H1>Leading</H1>
-- THIS MENU USES II'S STUPID MENU'S TEMPLATE TO HELP BUILD AND HOLD THE MENU, SPECIAL THANKS TO IIDK FOR THE FREE TEMPLATE USE.
-
-<H2>Overview</H2>
-Rift Menu is an open-source cheat menu designed for Gorilla Tag. It is built with performance in mind, offering a compact and lightweight experience that has minimal impact on the game's framerate. The menu provides a variety of cheats and modifications to enhance or alter gameplay, and it is free to use.
+<H2>New Features</H2>
+<H3>New Features 1.0.0</H3>
++ Mods/mods.cs Remake<br>
++ Gun Library Remake<br>
++ Menu Layout Remake<br>
++ Main.cs Remake
+<H3>New Features 1.2.7</H3>
++ Movement<br>
++ Fun<br>
++ Advantages<br>
++ Safety<br>
++ Settings<br>
++ Visuals<br>
 
 <H2>Permissions</H2>
 <H3>Am I allowed to take code from this page?</H3>
@@ -17,21 +25,24 @@ Rift Menu is an open-source cheat menu designed for Gorilla Tag. It is built wit
 <H3>Do I need a good computer to use this?</H3>
 - No, you just need a computer that can run Gorilla Tag and make sure to have a working BepInEx and a plugins folder you move it to.
 
-<H2>New Features</H2>
-Mods/mods.cs Remake, Gun Library Remake, Menu Layout Remake, Main.cs Remake
-
 <H2>Installation</H2>
-1. Download the menu from the Rift repository: https://github.com/Fevps/Rift/releases/tag/gtag
-2. Download/Locate BepInEx and create/locate your plugins within BepInEx, and move Rift.dll into it
-3. Launch Gorilla Tag.
+1. Download the menu from the Rift repository: https://github.com/Fevps/Rift/releases/tag/gtag<br>
+2. Download/Locate BepInEx and create/locate your plugins within BepInEx, and move Rift.dll into it<br>
+3. Launch Gorilla Tag.<br>
 
 <H2>Usage</H2>
-In VR, using the Y button will initialize the menu.
-In PC, using the R key will initialize the menu.
-In PC, using the F3 key will initialize the Room Manager.
+In VR, using the Y button will initialize the menu.<br>
+In PC, using the R key will initialize the menu.<br>
+In PC, using the F3 key will initialize the Room Manager.<br>
 
 <H2>License</H2>
 This project is licensed under the Apache License 2.0. You are free to use, modify, and distribute the code, provided you adhere to the license's terms. However, you cannot create new projects under the same name as the original. For more details, see the LICENSE file.
 
 <H2>Disclaimer</H2>
 This cheat menu is intended for light-use and harmless content, sure it can affect some lobbies but not for serious use, any bans or reports is your responsibility, we take no part from you getting any type of punishment for using this.
+
+<H2>Credits</H2>
+goldentrophy, owner of ii's Stupid Menu, following his rules, we're using his template, StupidTemplate.<br>
+functionkey0, owner of Rift, has distributed and developed Rift Menu.<br>
+catlicker., ex developer, has distributed some of the mods and functions within Rift, with his permission.<br>
+chip124_2, has developed and helped fix the Board's Text.<br>
