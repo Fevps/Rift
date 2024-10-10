@@ -39,7 +39,8 @@ In PC, using the F3 key will initialize the Room Manager.<br>
 This project is licensed under the Apache License 2.0. You are free to use, modify, and distribute the code, provided you adhere to the license's terms. However, you cannot create new projects under the same name as the original. For more details, see the LICENSE file.
 
 <H2>Disclaimer</H2>
-This cheat menu is intended for light-use and harmless content, sure it can affect some lobbies but not for serious use, any bans or reports is your responsibility, we take no part from you getting any type of punishment for using this.
+This cheat menu is intended for light-use and harmless content, sure it can affect some lobbies but not for serious use, any bans or reports is your responsibility, we take no part from you getting any type of punishment for using this.<br>
+THIS MENU DOES DELETE AND ADD FILES TO YOUR COMPUTER, YOU CAN CHECK WHAT IT DOES IN THE SOURCE CODE, HERE'S THE ONLY USES: https://github.com/Fevps/Rift/blob/main/Menu/Mods/Settings.cs
 
 <H2>Credits</H2>
 goldentrophy, owner of ii's Stupid Menu, following his rules, we're using his template, StupidTemplate.<br>
