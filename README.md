@@ -46,3 +46,6 @@ goldentrophy, owner of ii's Stupid Menu, following his rules, we're using his te
 functionkey0, owner of Rift, has distributed and developed Rift Menu.<br>
 catlicker., ex developer, has distributed some of the mods and functions within Rift, with his permission.<br>
 chip124_2, has developed and helped fix the Board's Text.<br>
+
+<H2>Inspiration</H2>
+I always wanted to create a famous Gorilla Tag cheat menu and now I kind of acomplished my goals, I just got to continue them and work into making my menu bigger, I was inspired by multiple famous menu creators to create Rift, from ShibaGT to iiDk, a lot of people has helped me learn and how to view this modding community, as time progresses I figure out how much I've grown ever since 12/29/23 (my start) to 1/24/24 (rift start) to now, I've learnt a lot and experienced a lot, from accusations to failures, from recognition and fame, this community has helped me as a person and I wanted to show my love for it, by creating Rift.
