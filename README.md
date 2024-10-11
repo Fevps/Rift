@@ -15,7 +15,7 @@ Rift is a lightweight cheat menu created by [f3](https://guns.lol/f3), fully des
 ---
 
 ## Am I allowed to take code from this GitHub Page?
-Yes, under the [Apache 2.0 License's guidelines](https://github.com/Fevps/Rift/blob/main/LICENSE), you may take what ever code you need, just don't use Rift as your name.
+Yes, under the [Apache 2.0 License's guidelines](https://github.com/Fevps/Rift/blob/main/LICENSE), you may take what ever code you need, just don't use Rift as your name. No credits needed, we would appreciate it though!
 
 ---
 
