@@ -16,10 +16,7 @@ using static StupidTemplate.Menu.Optimization;
 using static StupidTemplate.Menu.Mods.Advantages;
 using static StupidTemplate.Menu.Mods.Current;
 using static StupidTemplate.Menu.Mods.Fun;
-using static StupidTemplate.Menu.Mods.Minecraft;
-using static StupidTemplate.Menu.Mods.Miscellaneous;
 using static StupidTemplate.Menu.Mods.Movement;
-using static StupidTemplate.Menu.Mods.Rig;
 using static StupidTemplate.Menu.Mods.Visuals;
 using static StupidTemplate.Menu.Mods.Safety;
 

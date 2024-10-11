@@ -6,7 +6,7 @@ using Photon.Realtime;
 using UnityEngine;
 using Player = Photon.Realtime.Player;
 using static StupidTemplate.Menu.Main;
-
+using StupidTemplate.Menu.Mods;
 namespace StupidTemplate.Menu
 {
     internal class Optimization
@@ -61,7 +61,6 @@ namespace StupidTemplate.Menu
             lineUser.SetPosition(1, Position2);
             Object.Destroy(lineFollow, Time.deltaTime);
         }
-        private static int wrigj4wgj = 0;
 
         public static void CreateBox(Color Color, VRRig player)
         {
@@ -155,7 +154,7 @@ namespace StupidTemplate.Menu
             Object.Destroy(mymemorymymemory, Time.deltaTime);
         }
 
-        public static void CreatePlatform(Color Color, Vector3 Position, Quaternion Rotation, float T)
+        public static void CreatePlatform(Color Color, Vector3 Position, Quaternion Rotation, float T, bool Outline)
         {
             GameObject Platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Object.Destroy(Platform.GetComponent<Collider>());
@@ -165,13 +164,16 @@ namespace StupidTemplate.Menu
             Platform.GetComponent<Renderer>().material.color = Color;
             Object.Destroy(Platform, T);
 
-            GameObject Outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Object.Destroy(Outline.GetComponent<Collider>());
-            Outline.transform.position = Position;
-            Outline.transform.rotation = Rotation;
-            Outline.transform.localScale = new Vector3(0.023f, 0.235f, 0.325f);
-            Outline.GetComponent<Renderer>().material.color = Color.black;
-            Object.Destroy(Outline, T);
+            if (Outline)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Object.Destroy(outline.GetComponent<Collider>());
+                outline.transform.position = Position;
+                outline.transform.rotation = Rotation;
+                outline.transform.localScale = new Vector3(0.023f, 0.235f, 0.325f);
+                outline.GetComponent<Renderer>().material.color = Color.black;
+                Object.Destroy(outline, T);
+            }
         }
 
         public static string yourName()
@@ -242,10 +244,13 @@ namespace StupidTemplate.Menu
             VRRig outRig = null;
             foreach (VRRig vrrig in GorillaParent.instance.vrrigs)
             {
-                if (Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) < num)
+                if (!vrrig.isOfflineVRRig)
                 {
-                    num = Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position);
-                    outRig = vrrig;
+                    if (Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) < num)
+                    {
+                        num = Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position);
+                        outRig = vrrig;
+                    }
                 }
             }
             return outRig;
@@ -256,54 +261,9 @@ namespace StupidTemplate.Menu
             return (PhotonView)Traverse.Create(p).Field("photonView").GetValue();
         }
 
-        public static Player GetRandomPlayer(bool includeSelf)
-        {
-            if (includeSelf)
-            {
-                return PhotonNetwork.PlayerList[Random.Range(0, PhotonNetwork.PlayerList.Length - 1)];
-            }
-            else
-            {
-                return PhotonNetwork.PlayerListOthers[Random.Range(0, PhotonNetwork.PlayerListOthers.Length - 1)];
-            }
-        }
-
         public static Player GetPlayerFromVRRig(VRRig p)
         {
             return GetPhotonViewFromVRRig(p).Owner;
-        }
-
-        public static Player GetPlayerFromID(string id)
-        {
-            Player found = null;
-            foreach (Player target in PhotonNetwork.PlayerList)
-            {
-                if (target.UserId == id)
-                {
-                    found = target;
-                    break;
-                }
-            }
-            return found;
-        }
-
-        public static void GetBugOwnership()
-        {
-            foreach (ThrowableBug bug in Resources.FindObjectsOfTypeAll<ThrowableBug>())
-            {
-                bug.allowPlayerStealing = true;
-                bug.allowWorldSharableInstance = true;
-                bug.OnOwnershipRequest(PhotonNetwork.LocalPlayer);
-                bug.WorldShareableRequestOwnership();
-            }
-        }
-
-        public static void TeleportBug(Vector3 Position)
-        {
-            foreach (ThrowableBug bug in Resources.FindObjectsOfTypeAll<ThrowableBug>())
-            {
-                bug.transform.position = Position;
-            }
         }
     }
 }

@@ -16,10 +16,7 @@ using static StupidTemplate.Menu.Optimization;
 using static StupidTemplate.Menu.Mods.Advantages;
 using static StupidTemplate.Menu.Mods.Current;
 using static StupidTemplate.Menu.Mods.Fun;
-using static StupidTemplate.Menu.Mods.Minecraft;
-using static StupidTemplate.Menu.Mods.Miscellaneous;
 using static StupidTemplate.Menu.Mods.Movement;
-using static StupidTemplate.Menu.Mods.Rig;
 using static StupidTemplate.Menu.Mods.Visuals;
 using static StupidTemplate.Menu.Mods.Safety;
 
@@ -31,6 +28,7 @@ using StupidTemplate.Menu.Mods;
 using System.Net;
 using TMPro;
 using GorillaNetworking;
+using System.Collections.Generic;
 
 namespace StupidTemplate.Menu.Mods
 {
@@ -83,18 +81,82 @@ namespace StupidTemplate.Menu.Mods
                 {
                     if (gameobject == null)
                     {
-                        GorillaScoreBoard[] ScoreBoard = GameObject.FindObjectsOfType<GorillaScoreBoard>();
-                        foreach (GorillaScoreBoard boardObject in ScoreBoard)
+                        try
                         {
-                            if (boardObject != null && ScoreBoard != null)
+                            if (Forest.activeSelf == true)
+                            {
+                                GorillaScoreBoard[] ScoreBoard = GameObject.FindObjectsOfType<GorillaScoreBoard>();
+                                foreach (GorillaScoreBoard boardObject in ScoreBoard)
+                                {
+                                    if (boardObject != null && ScoreBoard != null)
+                                    {
+                                        gameobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                        gameobject.transform.localScale = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                                        gameobject.transform.position = boardObject.transform.position;
+                                        UnityEngine.Object.Destroy(gameobject, Time.deltaTime);
+                                        UnityEngine.Object.Destroy(gameobject.GetComponent<Rigidbody>());
+                                        UnityEngine.Object.Destroy(gameobject.GetComponent<BoxCollider>());
+                                    }
+                                }
+                            }
+                            if (City.activeSelf == true)
                             {
                                 gameobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
                                 gameobject.transform.localScale = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-                                gameobject.transform.position = boardObject.transform.position;
+                                gameobject.transform.position = new Vector3(-60.29f, 17.21f, -106.52f);
                                 UnityEngine.Object.Destroy(gameobject, Time.deltaTime);
                                 UnityEngine.Object.Destroy(gameobject.GetComponent<Rigidbody>());
                                 UnityEngine.Object.Destroy(gameobject.GetComponent<BoxCollider>());
                             }
+                            if (Canyon.activeSelf == true)
+                            {
+                                gameobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                gameobject.transform.localScale = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                                gameobject.transform.position = new Vector3(-88.23f, 10.89f, -107.58f);
+                                UnityEngine.Object.Destroy(gameobject, Time.deltaTime);
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<Rigidbody>());
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<BoxCollider>());
+                            }
+                            if (Mountain.activeSelf == true)
+                            {
+                                gameobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                gameobject.transform.localScale = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                                gameobject.transform.position = new Vector3(-16.33f, 18.27f, -112.19f);
+                                UnityEngine.Object.Destroy(gameobject, Time.deltaTime);
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<Rigidbody>());
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<BoxCollider>());
+                            }
+                            if (Clouds.activeSelf == true)
+                            {
+                                gameobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                gameobject.transform.localScale = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                                gameobject.transform.position = new Vector3(-73.62f, 162.87f, -101.45f);
+                                UnityEngine.Object.Destroy(gameobject, Time.deltaTime);
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<Rigidbody>());
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<BoxCollider>());
+                            }
+                            if (Beach.activeSelf == true)
+                            {
+                                gameobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                gameobject.transform.localScale = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                                gameobject.transform.position = new Vector3(25.97f, 10.16f, -0.20f);
+                                UnityEngine.Object.Destroy(gameobject, Time.deltaTime);
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<Rigidbody>());
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<BoxCollider>());
+                            }
+                            if (Basement.activeSelf == true)
+                            {
+                                gameobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                gameobject.transform.localScale = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                                gameobject.transform.position = new Vector3(-33.82f, 15.21f, -87.76f);
+                                UnityEngine.Object.Destroy(gameobject, Time.deltaTime);
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<Rigidbody>());
+                                UnityEngine.Object.Destroy(gameobject.GetComponent<BoxCollider>());
+                            }
+                        }
+                        catch
+                        {
+                            NotifiLib.SendNotification($"<color=red>ERROR</color>");
                         }
                     }
                     bool disconnected = false;
@@ -102,14 +164,14 @@ namespace StupidTemplate.Menu.Mods
                     {
                         if ((Vector3.Distance(gameobject.transform.position, player.leftHandTransform.position) < 1.45f) || (Vector3.Distance(gameobject.transform.position, player.rightHandTransform.position) < 1.45f))
                         {
-                            if (i==1)
+                            if (i == 1)
                             {
                                 NotifiLib.SendNotification("Someone got too close or attempted to report you.");
                                 PhotonNetwork.Disconnect();
                             }
                             else
                             {
-                                if (i==2)
+                                if (i == 2)
                                 {
                                     NotifiLib.SendNotification("Someone got too close or attempted to report you.");
                                     PhotonNetwork.Disconnect();
@@ -117,7 +179,7 @@ namespace StupidTemplate.Menu.Mods
                                 }
                                 else
                                 {
-                                    if (i==3)
+                                    if (i == 3)
                                     {
                                         NotifiLib.SendNotification("Someone got too close or attempted to report you.");
                                         ServerHop();
@@ -134,6 +196,16 @@ namespace StupidTemplate.Menu.Mods
                 }
             }
         }
+
+        /*
+            { Forest, BoardPosition() },
+            { City, new Vector3(-60.29f, 17.21f, -106.52f) },
+            { Canyon, new Vector3(-88.23f, 10.89f, -107.58f) },
+            { Mountain, new Vector3(-16.33f, 18.27f, -112.19f) },
+            { Clouds, new Vector3(-73.62f, 162.87f, -101.45f) },
+            { Beach, new Vector3(25.97f, 10.16f, -0.20f) },
+            { Basement, new Vector3(-33.82f, 15.21f, -87.76f) },
+        */
 
         public static void AntiFamous()
         {

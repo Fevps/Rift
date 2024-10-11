@@ -2,21 +2,18 @@
 using GorillaNetworking;
 using Photon.Pun;
 using StupidTemplate.Menu;
+using StupidTemplate.Menu.Mods;
 using System;
 using UnityEngine;
+using static Photon.Pun.UtilityScripts.TabViewManager;
+using static StupidTemplate.Menu.Main;
 [BepInPlugin("RiftHUD", "", "0.1.5")]
 public class RiftUI : BaseUnityPlugin
 {
-    public static bool arrayTrue = true;
-    public static bool guibld = true;
-    public static bool roomList = true;
-    public static bool GUIEnabled = true;
-    private bool act = false;
-    private float debo;
-    private Rect rect = new Rect(0f, 0f, 200f, 60f);
-    private string code = "";
-
-
+    public bool act = false;
+    public float debo;
+    public Rect rect = new Rect(0f, 0f, 200f, 60f);
+    public string code = "";
     void OnGUI()
     {
         if (GUIEnabled)
@@ -58,47 +55,74 @@ public class RiftUI : BaseUnityPlugin
             {
                 try
                 {
-                    GUIStyle style = new GUIStyle
+                    GUIStyle legacyStyle = new GUIStyle
                     {
                         fontSize = 15,
+                        fontStyle = FontStyle.Bold,
+                        alignment = TextAnchor.MiddleRight,
                         normal =
                         {
-                            textColor = Color.Lerp(Color.grey, Color.white, Mathf.PingPong(Time.time, 1))
+                            textColor = Color.Lerp(Color.magenta, Color.green, Mathf.PingPong(Time.time, 1))
+                        },
+                        padding = new RectOffset(10, 10, 5, 5)
+                    };
+                    GUIStyle playerlistStyle = new GUIStyle
+                    {
+                        fontSize = 12,
+                        fontStyle = FontStyle.Bold,
+                        alignment = TextAnchor.UpperRight,
+                        normal =
+                        {
+                            textColor = Color.white
                         }
                     };
-                    GUILayout.BeginVertical(Array.Empty<GUILayoutOption>());
+                    GUIStyle titleStyle = new GUIStyle
+                    {
+                        fontSize = 20,
+                        fontStyle = FontStyle.Bold,
+                        alignment = TextAnchor.MiddleRight,
+                        normal =
+                        {
+                            textColor = Color.Lerp(Color.red, Color.grey, Mathf.PingPong(Time.time, 1))
+                        }
+                    };
+                    GUIStyle lineStyle = new GUIStyle(GUI.skin.box)
+                    {
+                        border = new RectOffset(1, 1, 1, 1),
+                        fixedHeight = 2 
+                    };
+                    GUILayout.BeginArea(new Rect(Screen.width - 205, 10, 210, Screen.height - 20));
+                    GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandHeight(true));
+                    GUILayout.Label("Rift  ", titleStyle);
+                    GUILayout.Space(10);
+                    if (PhotonNetwork.InRoom)
+                    {
+                        GUILayout.Label("Players: ", playerlistStyle);
+                        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+                        {
+                            GUILayout.Label(player.NickName, legacyStyle);
+                        }
+                        GUILayout.Space(5);
+                        GUILayout.Box("", lineStyle, GUILayout.ExpandWidth(true));
+                        GUILayout.Space(5);
+                    }
                     foreach (ButtonInfo[] buttons in Buttons.buttons)
                     {
                         foreach (ButtonInfo enabled in buttons)
                         {
                             if (enabled.enabled)
                             {
-                                GUILayout.Label(enabled.buttonText, style, Array.Empty<GUILayoutOption>());
+                                if (GUILayout.Button(enabled.buttonText, legacyStyle, GUILayout.Height(30)))
+                                {
+                                    Toggle(enabled.buttonText);
+                                }
                             }
                         }
                     }
                     GUILayout.EndVertical();
-                }
-                catch { }
-            }
-            if (roomList)
-            {
-                try
-                {
-                    GUIStyle style = new GUIStyle
-                    {
-                        fontSize = 18,
-                        normal = { textColor = Color.Lerp(Color.grey, Color.white, Mathf.PingPong(Time.time, 1)) } };
-                    GUILayout.BeginVertical(Array.Empty<GUILayoutOption>());
-                    foreach (Photon.Realtime.Player names in PhotonNetwork.PlayerList)
-                    {
-                        VRRig Tagged = Optimization.GetVRRigFromPlayer(names);
-                        string i = names.NickName;
-                        GUILayout.Label(i + isTagged(Tagged), style, Array.Empty<GUILayoutOption>());
-                    }
-                    GUILayout.EndVertical();
-                }
-                catch { }
+                    GUILayout.EndArea();
+                } catch { }
+
             }
             GUI.color = Color.black;
             GUI.contentColor = Color.magenta;
@@ -127,6 +151,11 @@ public class RiftUI : BaseUnityPlugin
         }
         GUILayout.EndVertical();
         GUI.DragWindow();
+    }
+
+    private void Tag(VRRig target)
+    {
+        Advantages.Tag(target);
     }
 
     string isTagged(VRRig i)

@@ -7,6 +7,7 @@ namespace StupidTemplate
     internal class Settings
     {
         public static ExtGradient backgroundColor = new ExtGradient{isRainbow = true};
+        public static ExtGradient backgroundColor1 = new ExtGradient();
         public static ExtGradient[] buttonColors = new ExtGradient[]
         {
             new ExtGradient{colors = GetSolidGradient(Color.black) }, // Disabled

@@ -16,10 +16,7 @@ using static StupidTemplate.Menu.Optimization;
 using static StupidTemplate.Menu.Mods.Advantages;
 using static StupidTemplate.Menu.Mods.Current;
 using static StupidTemplate.Menu.Mods.Fun;
-using static StupidTemplate.Menu.Mods.Minecraft;
-using static StupidTemplate.Menu.Mods.Miscellaneous;
 using static StupidTemplate.Menu.Mods.Movement;
-using static StupidTemplate.Menu.Mods.Rig;
 using static StupidTemplate.Menu.Mods.Visuals;
 using static StupidTemplate.Menu.Mods.Safety;
 
@@ -33,6 +30,8 @@ using TMPro;
 using GorillaNetworking;
 using System.Collections;
 using Photon.Voice;
+using System.Threading.Tasks;
+using g3;
 
 namespace StupidTemplate.Menu.Mods
 {
@@ -91,139 +90,73 @@ namespace StupidTemplate.Menu.Mods
         public static GameObject platformsR;
         public static GameObject outlineL;
         public static GameObject outlineR;
-        public static bool rplatEnabled = false;
-        public static bool lplatEnabled = false;
-
-        public static bool sticky = false;
-
-        public static int platChanger = 1;
-
-        public static void Plattys(Color color, bool trigger)
+        
+        public static void Plattys(Color color, bool Rinput, bool Linput)
         {
-            if (trigger)
+            if (Rinput || Mouse.current.rightButton.isPressed)
             {
-                if (rightT > .2f || Mouse.current.rightButton.isPressed)
+                if (!rplatEnabled)
                 {
-                    if (!rplatEnabled)
-                    {
-                        platformsR = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        platformsR.GetComponent<Renderer>().material.color = ButtonColor;
-                        platformsR.transform.position = GorillaLocomotion.Player.Instance.rightControllerTransform.position + new Vector3(0, -0.00009f, 0);
-                        platformsR.transform.rotation = GorillaLocomotion.Player.Instance.rightControllerTransform.rotation;
-                        platformsR.transform.localScale = new Vector3(0.025f, 0.23f, 0.32f);
+                    platformsR = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    platformsR.GetComponent<Renderer>().material.color = ButtonColor;
+                    platformsR.transform.position = GorillaLocomotion.Player.Instance.rightControllerTransform.position + (sticky ? new Vector3(0, 0, 0) : new Vector3(0, -0.00009f, 0));
+                    platformsR.transform.rotation = GorillaLocomotion.Player.Instance.rightControllerTransform.rotation;
+                    platformsR.transform.localScale = new Vector3(0.025f, 0.23f, 0.32f);
 
+                    if (outlinedMenu)
+                    {
                         outlineR = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         UnityEngine.Object.Destroy(outlineR.GetComponent<Collider>());
                         outlineR.GetComponent<Renderer>().material.color = EnabledColor;
                         outlineR.transform.position = platformsR.transform.position;
                         outlineR.transform.rotation = platformsR.transform.rotation;
                         outlineR.transform.localScale = new Vector3(0.023f, 0.235f, 0.325f);
+                    }
 
-                        rplatEnabled = true;
-                    }
-                }
-                if (leftT > .2f || Mouse.current.leftButton.isPressed)
-                {
-                    if (!lplatEnabled)
-                    {
-                        platformsL = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        platformsL.GetComponent<Renderer>().material.color = ButtonColor;
-                        platformsL.transform.position = GorillaLocomotion.Player.Instance.leftControllerTransform.position + new Vector3(0, -0.00009f, 0);
-                        platformsL.transform.rotation = GorillaLocomotion.Player.Instance.leftControllerTransform.rotation;
-                        platformsL.transform.localScale = new Vector3(0.025f, 0.23f, 0.32f);
-
-                        outlineL = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        UnityEngine.Object.Destroy(outlineL.GetComponent<Collider>());
-                        outlineL.GetComponent<Renderer>().material.color = EnabledColor;
-                        outlineL.transform.position = platformsL.transform.position;
-                        outlineL.transform.rotation = platformsL.transform.rotation;
-                        outlineL.transform.localScale = new Vector3(0.023f, 0.235f, 0.325f);
-
-                        lplatEnabled = true;
-                    }
-                }
-                if (rightT < .2f)
-                {
-                    if (rplatEnabled)
-                    {
-                        UnityEngine.Object.Destroy(rplat);
-                        UnityEngine.Object.Destroy(platformsR);
-                        UnityEngine.Object.Destroy(outlineL);
-                        rplatEnabled = false;
-                    }
-                }
-                if (leftT < .2f)
-                {
-                    if (lplatEnabled)
-                    {
-                        UnityEngine.Object.Destroy(lplat);
-                        UnityEngine.Object.Destroy(platformsL);
-                        UnityEngine.Object.Destroy(outlineR);
-                        lplatEnabled = false;
-                    }
+                    rplatEnabled = true;
                 }
             }
-            else
+            if (Linput || Mouse.current.leftButton.isPressed)
             {
-                if (ControllerInputPoller.instance.rightGrab || Mouse.current.rightButton.isPressed)
+                if (!lplatEnabled)
                 {
-                    if (!rplatEnabled)
+                    platformsL = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    platformsL.GetComponent<Renderer>().material.color = ButtonColor;
+                    platformsL.transform.position = GorillaLocomotion.Player.Instance.leftControllerTransform.position + (sticky ? new Vector3(0, 0, 0) : new Vector3(0, -0.00009f, 0));
+                    platformsL.transform.rotation = GorillaLocomotion.Player.Instance.leftControllerTransform.rotation;
+                    platformsL.transform.localScale = new Vector3(0.025f, 0.23f, 0.32f);
+
+                    if (outlinedMenu)
                     {
-                        platformsR = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        platformsR.GetComponent<Renderer>().material.color = ButtonColor;
-                        platformsR.transform.position = GorillaLocomotion.Player.Instance.rightControllerTransform.position + new Vector3(0, -0.00009f);
-                        platformsR.transform.rotation = GorillaLocomotion.Player.Instance.rightControllerTransform.rotation;
-                        platformsR.transform.localScale = new Vector3(0.025f, 0.23f, 0.32f);
-
-                        outlineR = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        UnityEngine.Object.Destroy(outlineR.GetComponent<Collider>());
-                        outlineR.GetComponent<Renderer>().material.color = EnabledColor;
-                        outlineR.transform.position = platformsR.transform.position;
-                        outlineR.transform.rotation = platformsR.transform.rotation;
-                        outlineR.transform.localScale = new Vector3(0.023f, 0.235f, 0.325f);
-
-                        rplatEnabled = true;
-                    }
-                }
-                if (ControllerInputPoller.instance.leftGrab || Mouse.current.leftButton.isPressed)
-                {
-                    if (!lplatEnabled)
-                    {
-                        platformsL = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        platformsL.GetComponent<Renderer>().material.color = ButtonColor;
-                        platformsL.transform.position = GorillaLocomotion.Player.Instance.leftControllerTransform.position + new Vector3(0, -0.00009f);
-                        platformsL.transform.rotation = GorillaLocomotion.Player.Instance.leftControllerTransform.rotation;
-                        platformsL.transform.localScale = new Vector3(0.025f, 0.23f, 0.32f);
-
                         outlineL = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         UnityEngine.Object.Destroy(outlineL.GetComponent<Collider>());
                         outlineL.GetComponent<Renderer>().material.color = EnabledColor;
                         outlineL.transform.position = platformsL.transform.position;
                         outlineL.transform.rotation = platformsL.transform.rotation;
                         outlineL.transform.localScale = new Vector3(0.023f, 0.235f, 0.325f);
+                    }
 
-                        lplatEnabled = true;
-                    }
+                    lplatEnabled = true;
                 }
-                if (!ControllerInputPoller.instance.rightGrab)
+            }
+            if (!Rinput)
+            {
+                if (rplatEnabled)
                 {
-                    if (rplatEnabled)
-                    {
-                        UnityEngine.Object.Destroy(rplat);
-                        UnityEngine.Object.Destroy(platformsR);
-                        UnityEngine.Object.Destroy(outlineR);
-                        rplatEnabled = false;
-                    }
+                    UnityEngine.Object.Destroy(rplat);
+                    UnityEngine.Object.Destroy(platformsR);
+                    UnityEngine.Object.Destroy(outlineR);
+                    rplatEnabled = false;
                 }
-                if (!ControllerInputPoller.instance.leftGrab)
+            }
+            if (!Linput)
+            {
+                if (lplatEnabled)
                 {
-                    if (lplatEnabled)
-                    {
-                        UnityEngine.Object.Destroy(lplat);
-                        UnityEngine.Object.Destroy(platformsL);
-                        UnityEngine.Object.Destroy(outlineL);
-                        lplatEnabled = false;
-                    }
+                    UnityEngine.Object.Destroy(lplat);
+                    UnityEngine.Object.Destroy(platformsL);
+                    UnityEngine.Object.Destroy(outlineL);
+                    lplatEnabled = false;
                 }
             }
         }
@@ -232,17 +165,17 @@ namespace StupidTemplate.Menu.Mods
         {
             if (leftG)
             {
-                CreatePlatform(ButtonColor, GorillaTagger.Instance.leftHandTransform.position, GorillaTagger.Instance.leftHandTransform.rotation, 1.5f);
+                CreatePlatform(ButtonColor, GorillaTagger.Instance.leftHandTransform.position, GorillaTagger.Instance.leftHandTransform.rotation, 1.5f, outlinedMenu);
             }
             if (rightG)
             {
-                CreatePlatform(ButtonColor, GorillaTagger.Instance.rightHandTransform.position, GorillaTagger.Instance.rightHandTransform.rotation, 1.5f);
+                CreatePlatform(ButtonColor, GorillaTagger.Instance.rightHandTransform.position, GorillaTagger.Instance.rightHandTransform.rotation, 1.5f, outlinedMenu);
             }
         }
 
         public static void DrawPlatformsGun()
         {
-            GunLib.Gun(() => CreatePlatform(ButtonColor, GunPointer.transform.position, GorillaTagger.Instance.rightHandTransform.rotation, 2.5f), null);
+            GunLib.Gun(() => CreatePlatform(ButtonColor, GunPointer.transform.position, GorillaTagger.Instance.rightHandTransform.rotation, 2.5f, outlinedMenu), null);
         }
 
         public static void Fly()
@@ -452,14 +385,14 @@ namespace StupidTemplate.Menu.Mods
 
         public static void Speedboost()
         {
-            GorillaLocomotion.Player.Instance.maxJumpSpeed = Settings.jumpMultiplier;
-            GorillaLocomotion.Player.Instance.jumpMultiplier = Settings.jumpSpeed;
+            GorillaLocomotion.Player.Instance.maxJumpSpeed = jumpMultiplier;
+            GorillaLocomotion.Player.Instance.jumpMultiplier = jumpSpeed;
         }
 
         public static void IntegratedSpeedboost()
         {
-            GorillaLocomotion.Player.Instance.maxJumpSpeed += (Settings.jumpMultiplier / 2);
-            GorillaLocomotion.Player.Instance.jumpMultiplier += (Settings.jumpSpeed / 2);
+            GorillaLocomotion.Player.Instance.maxJumpSpeed += (jumpMultiplier / 2);
+            GorillaLocomotion.Player.Instance.jumpMultiplier += (jumpSpeed / 2);
         }
 
         public static void GripSpeedboost()
@@ -512,9 +445,9 @@ namespace StupidTemplate.Menu.Mods
         public static void TeleportGun()
         {
             GunLib.Gun(() => {
-                GorillaTagger.Instance.transform.position = GunHit.point + new Vector3(0, 1, 0);
-                GorillaTagger.Instance.myVRRig.transform.position = GunHit.point + new Vector3(0, 1, 0);
-                GorillaTagger.Instance.offlineVRRig.transform.position = GunHit.point + new Vector3(0, 1, 0);
+                GorillaTagger.Instance.transform.position = GunHit.point + new Vector3(0, .2f, 0);
+                GorillaTagger.Instance.myVRRig.transform.position = GunHit.point + new Vector3(0, .2f, 0);
+                GorillaTagger.Instance.offlineVRRig.transform.position = GunHit.point + new Vector3(0, .2f, 0);
 
                 GorillaTagger.Instance.rigidbody.velocity = Vector3.zero;
                 GorillaTagger.Instance.myVRRig.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -636,7 +569,7 @@ namespace StupidTemplate.Menu.Mods
             }
         }
 
-        public static void SpinHead()
+        /*public static void SpinHead()
         {
             GorillaTagger.Instance.offlineVRRig.head.trackingRotationOffset.x += 10f;
             GorillaTagger.Instance.offlineVRRig.head.trackingRotationOffset.y += 10f;
@@ -656,7 +589,7 @@ namespace StupidTemplate.Menu.Mods
         public static void SpinHeadZ()
         {
             GorillaTagger.Instance.offlineVRRig.head.trackingRotationOffset.z += 10f;
-        }
+        }*/
 
         public static void FixHead()
         {
@@ -665,7 +598,7 @@ namespace StupidTemplate.Menu.Mods
             GorillaTagger.Instance.offlineVRRig.head.trackingRotationOffset.z = 0f;
         }
 
-        public static void SnapHeadX()
+        /*public static void SnapHeadX()
         {
             GorillaTagger.Instance.offlineVRRig.head.trackingRotationOffset.x = 90f;
         }
@@ -693,7 +626,7 @@ namespace StupidTemplate.Menu.Mods
         public static void FlipHeadZ()
         {
             GorillaTagger.Instance.offlineVRRig.head.trackingRotationOffset.z = 180f;
-        }
+        }*/
 
         public static void RigGun()
         {
@@ -750,7 +683,7 @@ namespace StupidTemplate.Menu.Mods
 
         public static void Helicopter()
         {
-            if (ControllerInputPoller.instance.rightGrab || Mouse.current.rightButton.isPressed)
+            if (rightG || Mouse.current.rightButton.isPressed)
             {
                 GorillaTagger.Instance.offlineVRRig.enabled = false;
 
@@ -763,13 +696,13 @@ namespace StupidTemplate.Menu.Mods
             }
             else
             {
-                GorillaTagger.Instance.offlineVRRig.enabled = true;
+                FixRig();
             }
         }
 
         public static void Beyblade()
         {
-            if (ControllerInputPoller.instance.rightGrab || Mouse.current.rightButton.isPressed)
+            if (rightG || Mouse.current.rightButton.isPressed)
             {
                 GorillaTagger.Instance.offlineVRRig.enabled = false;
 
@@ -783,7 +716,7 @@ namespace StupidTemplate.Menu.Mods
             }
             else
             {
-                GorillaTagger.Instance.offlineVRRig.enabled = true;
+                FixRig();
             }
         }
 
@@ -802,41 +735,5 @@ namespace StupidTemplate.Menu.Mods
                 GorillaTagger.Instance.StartVibration(false, GorillaTagger.Instance.tapHapticStrength / 2, GorillaTagger.Instance.tagHapticDuration);
             }
         }
-
-        /*public static GameObject enderpearl = null;
-        public static float throwForce = 10f;
-        public static bool isThrown = false; 
-        public static float throwTime = 0f;
-        public static Material endermat = TextureLoader("https://www.google.com/url?sa=i&url=https%3A%2F%2Femoji.gg%2Femoji%2F7993-enderpearl&psig=AOvVaw3vSVenIVelCXIRf0ArzwaW&ust=1728179677864000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqGAoTCJCJhpGR9ogDFQAAAAAdAAAAABCTAQ");
-
-        public static void Enderpearl()
-        {
-            if (rightG)
-            {
-                if (enderpearl == null)
-                {
-                    enderpearl = GameObject.CreatePrimitive(0);
-                    UnityEngine.Object.Destroy(enderpearl.GetComponent<Collider>());
-                    UnityEngine.Object.Destroy(enderpearl.GetComponent<Rigidbody>());
-                    enderpearl.GetComponent<Renderer>().material = endermat;
-                }
-                enderpearl.transform.position = GorillaTagger.Instance.rightHandTransform.position;
-            }
-            if (!rightG && enderpearl != null)
-            {
-                enderpearl.GetComponent<Rigidbody>().AddForce(enderpearl.transform.forward * throwForce, ForceMode.Impulse);
-                isThrown = true;
-                throwTime = Time.time;
-            }
-            if (isThrown && Time.time >= throwTime + 2)
-            {
-                GorillaTagger.Instance.offlineVRRig.transform.position = enderpearl.transform.position;
-                GorillaTagger.Instance.GetComponent<Rigidbody>().velocity = enderpearl.transform.position;
-                UnityEngine.Object.Destroy(enderpearl);
-                enderpearl = null;
-                isThrown = false;
-                throwTime = Time.time + 0.2f;
-            }
-        }*/ //crashing out
     }
 }

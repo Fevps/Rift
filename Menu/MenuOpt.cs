@@ -16,10 +16,7 @@ using static StupidTemplate.Menu.Optimization;
 using static StupidTemplate.Menu.Mods.Advantages;
 using static StupidTemplate.Menu.Mods.Current;
 using static StupidTemplate.Menu.Mods.Fun;
-using static StupidTemplate.Menu.Mods.Minecraft;
-using static StupidTemplate.Menu.Mods.Miscellaneous;
 using static StupidTemplate.Menu.Mods.Movement;
-using static StupidTemplate.Menu.Mods.Rig;
 using static StupidTemplate.Menu.Mods.Visuals;
 using static StupidTemplate.Menu.Mods.Safety;
 
@@ -39,8 +36,8 @@ namespace StupidTemplate.Menu
         public GradientColorKey[] colors = new GradientColorKey[]
         {
             new GradientColorKey(Color.black, 0f),
-            new GradientColorKey(Color.magenta, 0.5f),
-            new GradientColorKey(Color.black, 1f)
+            new GradientColorKey(Color.black, 0.5f),
+            new GradientColorKey(Color.black, 1f),
         };
 
         public bool isRainbow = false;
@@ -66,7 +63,7 @@ namespace StupidTemplate.Menu
                     Color color = new Gradient { colorKeys = colorInfo.colors }.Evaluate(Time.time / 2f % 1);
                     if (colorInfo.isRainbow)
                     {
-                        float h = Time.frameCount / 180f % 1f;
+                        float h = Time.frameCount / 450f % 1f;
                         color = Color.HSVToRGB(h, 1f, 1f);
                     }
                     renderer.material.color = color;

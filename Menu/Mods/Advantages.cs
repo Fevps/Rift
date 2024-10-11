@@ -23,11 +23,11 @@ namespace StupidTemplate.Menu.Mods
         {
             if (PhotonNetwork.InRoom)
             {
-                if (vrrig == GorillaTagger.Instance.offlineVRRig)
+                if (vrrig.isOfflineVRRig)
                 {
                     foreach (VRRig rig in GorillaParent.instance.vrrigs)
                     {
-                        if (rig != GorillaTagger.Instance.offlineVRRig)
+                        if (!rig.isOfflineVRRig)
                         {
                             if (!Infected(GorillaTagger.Instance.offlineVRRig) && Infected(rig))
                             {
@@ -54,7 +54,7 @@ namespace StupidTemplate.Menu.Mods
                         }
                     }
                 }
-                else if (vrrig != GorillaTagger.Instance.offlineVRRig)
+                else if (!vrrig.isOfflineVRRig)
                 {
                     if (Infected(GorillaTagger.Instance.offlineVRRig) && !Infected(vrrig))
                     {
@@ -81,11 +81,11 @@ namespace StupidTemplate.Menu.Mods
 
         public static void TagAll()
         {
-            if (PhotonNetwork.InRoom || PhotonNetwork.InLobby)
+            if (PhotonNetwork.InRoom)
             {
                 foreach (VRRig i in GorillaParent.instance.vrrigs)
                 {
-                    if (i != GorillaTagger.Instance.offlineVRRig)
+                    if (!i.isOfflineVRRig)
                     {
                         if (!Infected(i) && Infected(GorillaTagger.Instance.offlineVRRig))
                         {
@@ -104,23 +104,24 @@ namespace StupidTemplate.Menu.Mods
             }
         }
 
-        public static void TagSelf()
+        public static void GripTagAll()
         {
-            bool tagged = false;
             if (PhotonNetwork.InRoom)
             {
-                foreach (VRRig i in GorillaParent.instance.vrrigs)
+                if (rightG)
                 {
-                    if (i != GorillaTagger.Instance.offlineVRRig)
+                    foreach (VRRig i in GorillaParent.instance.vrrigs)
                     {
-                        if (Infected(i) && !Infected(GorillaTagger.Instance.offlineVRRig) && !tagged)
+                        if (!i.isOfflineVRRig)
                         {
-                            Tag(GorillaTagger.Instance.offlineVRRig);
-                        }
-                        if (Infected(GorillaTagger.Instance.offlineVRRig))
-                        {
-                            GorillaTagger.Instance.offlineVRRig.enabled = true;
-                            tagged = true;
+                            if (!Infected(i) && Infected(GorillaTagger.Instance.offlineVRRig))
+                            {
+                                Tag(i);
+                            }
+                            else
+                            {
+                                GorillaTagger.Instance.offlineVRRig.enabled = true;
+                            }
                         }
                     }
                 }
@@ -129,10 +130,27 @@ namespace StupidTemplate.Menu.Mods
             {
                 GorillaTagger.Instance.offlineVRRig.enabled = true;
             }
-            if (Infected(GorillaTagger.Instance.offlineVRRig) || tagged)
+        }
+
+        public static bool TaggedSelf = false;
+        public static void TagSelf()
+        {
+            if (PhotonNetwork.InRoom)
+            {
+                foreach (VRRig i in GorillaParent.instance.vrrigs)
+                {
+                    if (!i.isOfflineVRRig)
+                    {
+                        if (Infected(i) && !Infected(GorillaTagger.Instance.offlineVRRig) && !TaggedSelf)
+                        {
+                            Tag(GorillaTagger.Instance.offlineVRRig);
+                        }
+                    }
+                }
+            }
+            else
             {
                 GorillaTagger.Instance.offlineVRRig.enabled = true;
-                GetIndex("Tag Self").enabled = false;
             }
         }
 
@@ -140,7 +158,14 @@ namespace StupidTemplate.Menu.Mods
         {
             if (PhotonNetwork.InRoom)
             {
-                Tag(GetRandomVRRig(false));
+                VRRig vr = GetRandomVRRig(false);
+                if (!Infected(vr))
+                {
+                    if (rightG)
+                    {
+                        Tag(vr);
+                    }
+                }
             }
         }
 
@@ -162,18 +187,21 @@ namespace StupidTemplate.Menu.Mods
 
         public static void TagAura()
         {
-            float distance = 4f;
-            VRRig outRig = null;
-            foreach (VRRig vrrig in GorillaParent.instance.vrrigs)
+            if (PhotonNetwork.InRoom)
             {
-                if (Infected(GorillaTagger.Instance.offlineVRRig) && vrrig != GorillaTagger.Instance.offlineVRRig && Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) < distance && !Infected(vrrig))
+                float distance = 4f;
+                VRRig outRig = null;
+                foreach (VRRig vrrig in GorillaParent.instance.vrrigs)
                 {
-                    distance = Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) * 4f;
-                    outRig = vrrig;
+                    if (Infected(GorillaTagger.Instance.offlineVRRig) && vrrig != GorillaTagger.Instance.offlineVRRig && Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) < distance && !Infected(vrrig))
+                    {
+                        distance = Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) * GorillaGameManager.instance.tagDistanceThreshold;
+                        outRig = vrrig;
+                    }
                 }
+                GorillaTagger.Instance.leftHandTransform.position = outRig.transform.position;
+                GorillaTagger.Instance.rightHandTransform.position = outRig.transform.position;
             }
-            GorillaTagger.Instance.leftHandTransform.position = outRig.transform.position;
-            GorillaTagger.Instance.rightHandTransform.position = outRig.transform.position;
         }
 
         public static void EnableReportPlayer()
@@ -192,90 +220,9 @@ namespace StupidTemplate.Menu.Mods
 
         public static void TagGun()
         {
-            if (rightG)
+            if (PhotonNetwork.InRoom)
             {
-                Physics.Raycast(GorillaTagger.Instance.rightHandTransform.position, -GorillaTagger.Instance.rightHandTransform.up, out GunHit);
-                GunPointer = GameObject.CreatePrimitive(0);
-                if (GunPointer == null) { GunPointer = GameObject.CreatePrimitive(0); }
-                if (GunTracer == null) { GunTracer = new GameObject("Line"); }
-                LineRenderer support = GunTracer.GetComponent<LineRenderer>();
-                if (support == null) { support = GunTracer.AddComponent<LineRenderer>(); }
-                GunPointer.transform.position = GunHit.point;
-                GunPointer.transform.localScale = new Vector3(.03f, .03f, .03f);
-                GunPointer.GetComponent<Renderer>().material.color = green;
-                support.material.shader = Shader.Find("GUI/Text Shader");
-                support.startColor = green;
-                support.endColor = green;
-                support.startWidth = .01f;
-                support.endWidth = .01f;
-                support.useWorldSpace = true;
-                support.positionCount = 2;
-                support.SetPosition(0, GorillaTagger.Instance.rightHandTransform.position);
-                support.SetPosition(1, GunPointer.transform.position);
-                SphereCollider guncollider = GunPointer.GetComponent<SphereCollider>();
-                guncollider.radius = .001f;
-                Object.Destroy(GunTracer, Time.deltaTime);
-                Object.Destroy(GunPointer, Time.deltaTime);
-                Object.Destroy(GunPointer.GetComponent<Rigidbody>());
-                Object.Destroy(GunPointer.GetComponent<SphereCollider>());
-                if (rightT > .2f)
-                {
-                    GunPointer.GetComponent<Renderer>().material.color = red;
-                    support.startColor = red;
-                    support.endColor = red;
-                    VRRig i = GunLib.GetClosestPlayer(GunPointer);
-                    if (!Infected(i)) { Tag(i); } else { FixRig(); }
-                }
-                else
-                {
-                    GunPointer.GetComponent<Renderer>().material.color = green;
-                    support.startColor = green;
-                    support.endColor = green;
-                    FixRig();
-                }
-            }
-            if (Mouse.current.rightButton.isPressed)
-            {
-                Ray ruh = GameObject.Find("Shoulder Camera").GetComponent<Camera>().ScreenPointToRay(Mouse.current.position.ReadValue(), Camera.MonoOrStereoscopicEye.Mono);
-                Physics.Raycast(ruh, out GunHit, int.MaxValue);
-                GunPointer = GameObject.CreatePrimitive(0);
-                if (GunPointer == null) { GunPointer = GameObject.CreatePrimitive(0); }
-                if (GunTracer == null) { GunTracer = new GameObject("Line"); }
-                LineRenderer support = GunTracer.GetComponent<LineRenderer>();
-                if (support == null) { support = GunTracer.AddComponent<LineRenderer>(); }
-                GunPointer.transform.position = GunHit.point;
-                GunPointer.transform.localScale = new Vector3(.03f, .03f, .03f);
-                GunPointer.GetComponent<Renderer>().material.color = green;
-                support.material.shader = Shader.Find("GUI/Text Shader");
-                support.startColor = green;
-                support.endColor = green;
-                support.startWidth = .01f;
-                support.endWidth = .01f;
-                support.useWorldSpace = true;
-                support.positionCount = 2;
-                support.SetPosition(0, GorillaTagger.Instance.rightHandTransform.position);
-                support.SetPosition(1, GunPointer.transform.position);
-                SphereCollider guncollider = GunPointer.GetComponent<SphereCollider>();
-                guncollider.radius = .001f;
-                Object.Destroy(GunTracer, Time.deltaTime);
-                Object.Destroy(GunPointer, Time.deltaTime);
-                Object.Destroy(GunPointer.GetComponent<Rigidbody>());
-                Object.Destroy(GunPointer.GetComponent<SphereCollider>());
-                if (Mouse.current.leftButton.isPressed)
-                {
-                    GunPointer.GetComponent<Renderer>().material.color = red;
-                    support.startColor = red;
-                    support.endColor = red;
-                    VRRig i = GunLib.GetClosestPlayer(GunPointer);
-                    if (!Infected(i)) { Tag(i); } else { FixRig(); }
-                }
-                else
-                {
-                    GunPointer.GetComponent<Renderer>().material.color = green;
-                    support.startColor = green;
-                    support.endColor = green;
-                    FixRig();
-                }
+                GunLib.Gun(() => { VRRig target = GunLib.GetClosestPlayer(GunPointer); Tag(target); }, () => FixRig());
             }
         }
 

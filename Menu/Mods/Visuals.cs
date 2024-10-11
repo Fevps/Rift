@@ -17,10 +17,7 @@ using static StupidTemplate.Menu.Optimization;
 using static StupidTemplate.Menu.Mods.Advantages;
 using static StupidTemplate.Menu.Mods.Current;
 using static StupidTemplate.Menu.Mods.Fun;
-using static StupidTemplate.Menu.Mods.Minecraft;
-using static StupidTemplate.Menu.Mods.Miscellaneous;
 using static StupidTemplate.Menu.Mods.Movement;
-using static StupidTemplate.Menu.Mods.Rig;
 using static StupidTemplate.Menu.Mods.Visuals;
 using static StupidTemplate.Menu.Mods.Safety;
 
@@ -565,6 +562,45 @@ namespace StupidTemplate.Menu.Mods
                     }
                 }
             }
+        }
+
+        public static void NearestTarget()
+        {
+            if (PhotonNetwork.InRoom)
+            {
+                bool tagged = Infected(GorillaTagger.Instance.offlineVRRig);
+                VRRig player = NearestVRRig(tagged ? true : false);
+                CreateBox(tagged ? green : red, player);
+            }
+        }
+
+        private static VRRig NearestVRRig(bool tagged)
+        {
+            float num = float.MaxValue;
+            VRRig outRig = null;
+            foreach (VRRig vrrig in GorillaParent.instance.vrrigs)
+            {
+                if (!vrrig.isOfflineVRRig)
+                {
+                    if (Infected(vrrig) && tagged)
+                    {
+                        if (Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) < num)
+                        {
+                            num = Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position);
+                            outRig = vrrig;
+                        }
+                    }
+                    else if (Infected(vrrig) && !tagged)
+                    {
+                        if (Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position) < num)
+                        {
+                            num = Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, vrrig.transform.position);
+                            outRig = vrrig;
+                        }
+                    }
+                }
+            }
+            return outRig;
         }
     }
 }

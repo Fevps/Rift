@@ -22,10 +22,7 @@ using static StupidTemplate.Menu.Optimization;
 using static StupidTemplate.Menu.Mods.Advantages;
 using static StupidTemplate.Menu.Mods.Current;
 using static StupidTemplate.Menu.Mods.Fun;
-using static StupidTemplate.Menu.Mods.Minecraft;
-using static StupidTemplate.Menu.Mods.Miscellaneous;
 using static StupidTemplate.Menu.Mods.Movement;
-using static StupidTemplate.Menu.Mods.Rig;
 using static StupidTemplate.Menu.Mods.Visuals;
 using static StupidTemplate.Menu.Mods.Safety;
 
@@ -37,11 +34,14 @@ using System.Net;
 using TMPro;
 using GorillaNetworking;
 using GorillaLocomotion.Gameplay;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace StupidTemplate.Menu.Mods
 {
     internal class Settings
     {
+        private static string Saved_Values = "Rift_Preferences\\Saved_Values";
+        private static string Saved_Bools = "Rift_Preferences\\Saved_Bools";
         public static void SavePreferences()
         {
             try
@@ -77,6 +77,122 @@ namespace StupidTemplate.Menu.Mods
                             }
                         }
                     }
+                    if (!Directory.Exists(Saved_Values))
+                    {
+                        Directory.CreateDirectory(Saved_Values);
+                        SavePreferences();
+                        return;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            if (!File.Exists(Saved_Values + "\\jumpCount"))
+                            {
+                                using (File.Create(Saved_Values + "\\jumpCount")) { }
+                            }
+                            File.WriteAllText(Saved_Values + "\\jumpCount", jumpCount.ToString());
+
+                            if (!File.Exists(Saved_Values + "\\slideCount"))
+                            {
+                                using (File.Create(Saved_Values + "\\slideCount")) { }
+                            }
+                            File.WriteAllText(Saved_Values + "\\slideCount", slideCount.ToString());
+
+                            if (!File.Exists(Saved_Values + "\\timeCount"))
+                            {
+                                using (File.Create(Saved_Values + "\\timeCount")) { }
+                            }
+                            File.WriteAllText(Saved_Values + "\\timeCount", timeMonicle.ToString());
+
+                            if (!File.Exists(Saved_Values + "\\themeCount"))
+                            {
+                                using (File.Create(Saved_Values + "\\themeCount")) { }
+                            }
+                            File.WriteAllText(Saved_Values + "\\themeCount", theme.ToString());
+
+                            if (!File.Exists(Saved_Values + "\\soundCount"))
+                            {
+                                using (File.Create(Saved_Values + "\\soundCount")) { }
+                            }
+                            File.WriteAllText(Saved_Values + "\\soundCount", sound.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            NotifiLib.SendNotification($"<color=red>ERROR</color>: {ex}");
+                            return;
+                        }
+                    }
+                    if (!Directory.Exists(Saved_Bools))
+                    {
+                        Directory.CreateDirectory(Saved_Bools);
+                        SavePreferences();
+                        return;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            if (!File.Exists(Saved_Bools + "\\invisui"))
+                            {
+                                using (File.Create(Saved_Bools + "\\invisui")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\invisui", menuBark.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\menudrop"))
+                            {
+                                using (File.Create(Saved_Bools + "\\menudrop")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\menudrop", menuDrop.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\triggerpages"))
+                            {
+                                using (File.Create(Saved_Bools + "\\triggerpages")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\triggerpages", triggerPages.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\outlinedmenu"))
+                            {
+                                using (File.Create(Saved_Bools + "\\outlinedmenu")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\outlinedmenu", outlinedMenu.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\rainbowoutline"))
+                            {
+                                using (File.Create(Saved_Bools + "\\rainbowoutline")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\rainbowoutline", rainbowOutline.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\menutext"))
+                            {
+                                using (File.Create(Saved_Bools + "\\menutext")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\menutext", menuText.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\customboard"))
+                            {
+                                using (File.Create(Saved_Bools + "\\customboard")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\customboard", customBoard.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\stickyplats"))
+                            {
+                                using (File.Create(Saved_Bools + "\\stickyplats")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\stickyplats", sticky.ToString());
+
+                            if (!File.Exists(Saved_Bools + "\\righthandmenu"))
+                            {
+                                using (File.Create(Saved_Bools + "\\righthandmenu")) { }
+                            }
+                            File.WriteAllText(Saved_Bools + "\\righthandmenu", rightHanded.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            NotifiLib.SendNotification($"<color=red>ERROR</color>: {ex}");
+                            return;
+                        }
+                    }
                 }
             }
             catch { SavePreferences(); return; }
@@ -87,20 +203,165 @@ namespace StupidTemplate.Menu.Mods
         {
             try
             {
-                foreach (ButtonInfo[] buttons in Buttons.buttons)
+                try
                 {
-                    foreach (ButtonInfo method in buttons)
+                    foreach (ButtonInfo[] buttons in Buttons.buttons)
                     {
-                        string[] enabled = File.ReadAllLines("Rift_Preferences\\Saved_Mods");
-                        if (enabled.Contains(method.buttonText))
+                        foreach (ButtonInfo method in buttons)
                         {
-                            method.enabled = true;
+                            string[] enabled = File.ReadAllLines("Rift_Preferences\\Saved_Mods");
+                            if (enabled.Contains(method.buttonText))
+                            {
+                                method.enabled = true;
+                            }
                         }
                     }
+                    if (File.Exists(Saved_Values + "\\jumpCount"))
+                    {
+                        string floatValue = File.ReadAllText(Saved_Values + "\\jumpCount");
+                        if (float.TryParse(floatValue, out float loadedFloat))
+                        {
+                            jumpCount = (int)loadedFloat - 1;
+                            SpeedChanger();
+                        }
+                    }
+                    if (File.Exists(Saved_Values + "\\slideCount"))
+                    {
+                        string floatValue = File.ReadAllText(Saved_Values + "\\slideCount");
+                        if (float.TryParse(floatValue, out float loadedFloat))
+                        {
+                            slideCount = (int)loadedFloat - 1;
+                            SlideChanger();
+                        }
+                    }
+                    if (File.Exists(Saved_Values + "\\timeCount"))
+                    {
+                        string floatValue = File.ReadAllText(Saved_Values + "\\timeCount");
+                        if (float.TryParse(floatValue, out float loadedFloat))
+                        {
+                            timeMonicle = (int)loadedFloat - 1;
+                            TimeChanger();
+                        }
+                    }
+                    if (File.Exists(Saved_Values + "\\themeCount"))
+                    {
+                        string floatValue = File.ReadAllText(Saved_Values + "\\themeCount");
+                        if (float.TryParse(floatValue, out float loadedFloat))
+                        {
+                            theme = (int)loadedFloat - 1;
+                            ChangeTheme();
+                        }
+                    }
+                    if (File.Exists(Saved_Values + "\\soundCount"))
+                    {
+                        string floatValue = File.ReadAllText(Saved_Values + "\\soundCount");
+                        if (float.TryParse(floatValue, out float loadedFloat))
+                        {
+                            sound = (int)loadedFloat - 1;
+                            ChangeSound();
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\invisui"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\invisui");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            menuBark = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\menudrop"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\menudrop");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            menuDrop = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\triggerpages"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\triggerpages");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            triggerPages = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\outlinedmenu"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\outlinedmenu");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            outlinedMenu = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\rainbowoutline"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\rainbowoutline");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            rainbowOutline = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\menutext"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\menutext");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            menuText = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\customboard"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\customboard");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            customBoard = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\stickyplats"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\stickyplats");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            sticky = loadedBool;
+                        }
+                    }
+                    if (File.Exists(Saved_Bools + "\\righthandmenu"))
+                    {
+                        string boolValue = File.ReadAllText(Saved_Bools + "\\righthandmenu");
+                        if (bool.TryParse(boolValue, out bool loadedBool))
+                        {
+                            rightHanded = loadedBool;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    NotifiLib.SendNotification($"<color=red>ERROR</color>: {ex}");
                 }
                 RecreateMenu();
             }
             catch { LoadPreferences(); return; }
+        }
+
+        public static void ResetPreferences()
+        {
+            try
+            {
+                File.Delete(Saved_Values + "\\jumpCount");
+                File.Delete(Saved_Values + "\\slideCount");
+                File.Delete(Saved_Values + "\\timeCount");
+                File.Delete(Saved_Values + "\\themeCount");
+                File.Delete(Saved_Values + "\\soundCount");
+
+                File.Delete(Saved_Bools + "\\invisui");
+                File.Delete(Saved_Bools + "\\menudrop");
+                File.Delete(Saved_Bools + "\\triggerpages");
+                File.Delete(Saved_Bools + "\\outlinedmenu");
+                File.Delete(Saved_Bools + "\\rainbowoutline");
+                File.Delete(Saved_Bools + "\\menutext");
+                File.Delete(Saved_Bools + "\\customboard");
+            }
+            catch { }
         }
 
         static float debouncer = 1f;
@@ -113,11 +374,6 @@ namespace StupidTemplate.Menu.Mods
             }
         }
 
-        static Vector3 originalPos;
-        static Quaternion originalRot;
-        static float originalFoV;
-        public static GameObject tpc = GameObject.Find("Shoulder Camera");
-        public static Camera TPC = tpc.GetComponent<Camera>();
         public static void FPC()
         {
             bool keyboardOpen = UnityInput.Current.GetKey(keyboardButton);
@@ -169,7 +425,6 @@ namespace StupidTemplate.Menu.Mods
         }
 
         private static int sound = 0;
-        public static int chosenSound = 66;
         public static void ChangeSound()
         {
             sound++;
@@ -234,6 +489,107 @@ namespace StupidTemplate.Menu.Mods
             }
         }
 
+        public static int theme = 1;
+        public static void ChangeTheme()
+        {
+            theme++;
+            if (theme > 10)
+            {
+                theme = 1;
+            }
+            if (theme == 1)
+            {
+                MenuColor = new Color32(20, 20, 20, 1);
+                ButtonColor = new Color32(50, 50, 50, 1);
+                EnabledColor = new Color32(20, 20, 20, 1);
+                TextColor = Color.white;
+                EnabledTextColor = Color.red;
+                TitleColor = Color.white;
+            }
+            if (theme == 2)
+            {
+                MenuColor = Color.yellow;
+                ButtonColor = Color.black;
+                EnabledColor = Color.yellow;
+                TextColor = Color.white;
+                EnabledTextColor = Color.black;
+                TitleColor = Color.black;
+            }
+            if (theme == 3)
+            {
+                MenuColor = new Color32(255, 228, 225, 255);
+                ButtonColor = new Color32(255, 105, 180, 255);
+                EnabledColor = new Color32(255, 20, 147, 255);
+                TextColor = Color.black;
+                EnabledTextColor = Color.black;
+                TitleColor = Color.black;
+            }
+            if (theme == 4)
+            {
+                MenuColor = new Color32(224, 255, 255, 255);
+                ButtonColor = new Color32(70, 130, 180, 255);
+                EnabledColor = new Color32(135, 206, 250, 255);
+                TextColor = Color.black;
+                EnabledTextColor = Color.black;
+                TitleColor = Color.black;
+            }
+            if (theme == 5)
+            {
+                MenuColor = new Color32(240, 255, 240, 255);
+                ButtonColor = new Color32(34, 139, 34, 255);
+                EnabledColor = new Color32(144, 238, 144, 255);
+                TextColor = Color.black;
+                EnabledTextColor = Color.black;
+                TitleColor = Color.black;
+            }
+            if (theme == 6)
+            {
+                MenuColor = new Color32(255, 250, 205, 255);
+                ButtonColor = new Color32(255, 165, 0, 255);
+                EnabledColor = new Color32(255, 69, 0, 255);
+                TextColor = Color.black;
+                EnabledTextColor = Color.white;
+                TitleColor = Color.black;
+            }
+            if (theme == 7)
+            {
+                MenuColor = new Color32(230, 230, 250, 255);
+                ButtonColor = new Color32(128, 0, 128, 255);
+                EnabledColor = new Color32(75, 0, 130, 255);
+                TextColor = Color.white;
+                EnabledTextColor = Color.yellow;
+                TitleColor = Color.black;
+            }
+            if (theme == 8)
+            {
+                MenuColor = new Color32(240, 240, 240, 255);
+                ButtonColor = new Color32(105, 105, 105, 255);
+                EnabledColor = new Color32(169, 169, 169, 255);
+                TextColor = Color.black;
+                EnabledTextColor = Color.black;
+                TitleColor = Color.black;
+            }
+            if (theme == 9)
+            {
+                MenuColor = new Color32(255, 255, 224, 255);
+                ButtonColor = new Color32(255, 255, 0, 255);
+                EnabledColor = new Color32(255, 255, 224, 255);
+                TextColor = Color.black;
+                EnabledTextColor = Color.black;
+                TitleColor = Color.black;
+            }
+            if (theme == 10)
+            {
+                MenuColor = new Color32(224, 255, 255, 255);
+                ButtonColor = new Color32(224, 255, 255, 255);
+                EnabledColor = new Color32(0, 191, 255, 255);
+                TextColor = Color.black;
+                EnabledTextColor = Color.grey;
+                TitleColor = Color.black;
+            }
+            RecreateMenu();
+        }
+
         public static void StartRaining()
         {
             for (int i = 1; i < BetterDayNightManager.instance.weatherCycle.Length; i++)
@@ -249,16 +605,6 @@ namespace StupidTemplate.Menu.Mods
                 BetterDayNightManager.instance.weatherCycle[i] = BetterDayNightManager.WeatherType.None;
             }
         }
-
-        public static float jumpMultiplier = 6.5f;
-
-        public static float jumpSpeed = 1.1f;
-
-        public static int jumpCount = 1;
-
-        public static int slideCount;
-
-        public static float slideControl = 1;
 
         public static void SpeedChanger()
         {
@@ -366,16 +712,6 @@ namespace StupidTemplate.Menu.Mods
                     objects.SetActive(false);
                 }
             }
-        }
-
-        public static void DisableNetworkTriggers()
-        {
-            GameObject.Find("Environment Objects/TriggerZones_Prefab/JoinRoomTriggers_Prefab").SetActive(false);
-        }
-
-        public static void EnableNetworkTriggers()
-        {
-            GameObject.Find("Environment Objects/TriggerZones_Prefab/JoinRoomTriggers_Prefab").SetActive(true);
         }
 
         public static void ForceLag(bool grip)

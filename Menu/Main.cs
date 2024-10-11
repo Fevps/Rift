@@ -16,10 +16,7 @@ using static StupidTemplate.Menu.Optimization;
 using static StupidTemplate.Menu.Mods.Advantages;
 using static StupidTemplate.Menu.Mods.Current;
 using static StupidTemplate.Menu.Mods.Fun;
-using static StupidTemplate.Menu.Mods.Minecraft;
-using static StupidTemplate.Menu.Mods.Miscellaneous;
 using static StupidTemplate.Menu.Mods.Movement;
-using static StupidTemplate.Menu.Mods.Rig;
 using static StupidTemplate.Menu.Mods.Visuals;
 using static StupidTemplate.Menu.Mods.Safety;
 
@@ -38,6 +35,7 @@ using GorillaTagScripts;
 using System.IO;
 using Photon.Realtime;
 using Unity.XR.CoreUtils;
+using System.Collections;
 
 namespace StupidTemplate.Menu
 {
@@ -52,18 +50,17 @@ namespace StupidTemplate.Menu
             new ButtonInfo[] { // [0] Home
                 new ButtonInfo { buttonText = "Settings", isTogglable = false, method =() => Category(1)},
                 new ButtonInfo { buttonText = "Current", isTogglable = false, method =() => Category(2)},
-                new ButtonInfo { buttonText = "Miscellaneous", isTogglable = false, method =() => Category(3)},
-                new ButtonInfo { buttonText = "Fun", isTogglable = false, method =() => Category(4)},
-                new ButtonInfo { buttonText = "Movement", isTogglable = false, method =() => Category(5)},
-                //new ButtonInfo { buttonText = "Rig", isTogglable = false, method =() => Category(6)},
-                new ButtonInfo { buttonText = "Visuals", isTogglable = false, method =() => Category(6)},
-                new ButtonInfo { buttonText = "Advantages", isTogglable = false, method =() => Category(7)},
-                new ButtonInfo { buttonText = "Safety", isTogglable = false, method =() => Category(8)},
+                new ButtonInfo { buttonText = "Fun", isTogglable = false, method =() => Category(3)},
+                new ButtonInfo { buttonText = "Movement", isTogglable = false, method =() => Category(4)},
+                new ButtonInfo { buttonText = "Visuals", isTogglable = false, method =() => Category(5)},
+                new ButtonInfo { buttonText = "Advantages", isTogglable = false, method =() => Category(6)},
+                new ButtonInfo { buttonText = "Safety", isTogglable = false, method =() => Category(7)},
             },
 
             new ButtonInfo[] { // [1] Settings
                 new ButtonInfo { buttonText = "<color=lime>Save</color> Preferences", isTogglable = false, method =() => SavePreferences()},
                 new ButtonInfo { buttonText = "<color=lime>Load</color> Preferences", isTogglable = false, method =() => LoadPreferences()},
+                new ButtonInfo { buttonText = "<color=red>Reset</color> Preferences", isTogglable = false, method =() => ResetPreferences()},
 
                 new ButtonInfo { buttonText = "Panic", isTogglable = false, method =() => DisableAllMods()},
 
@@ -73,19 +70,21 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Longer Notifications", isTogglable = true, enableMethod =() => NotifiLib.NoticationThreshold = 75, disableMethod =() => NotifiLib.NoticationThreshold = 30},
                 new ButtonInfo { buttonText = "Disable Notifications", isTogglable = true, enableMethod =() => NotifiLib.IsEnabled = false, disableMethod =() => NotifiLib.IsEnabled = true},
 
-                //new ButtonInfo { buttonText = "<color=lime>Upper</color> Text Menu", isTogglable = false, method =() => UpperCaseButtons()},
-                //new ButtonInfo { buttonText = "<color=lime>Lower</color> Text Menu", isTogglable = false, method =() => LowerCaseButtons()},
-                //new ButtonInfo { buttonText = "<color=lime>Random</color> Text Menu", isTogglable = false, method =() => RandomCaseButtons()},
-
                 new ButtonInfo { buttonText = "First Person", isTogglable = true, method =() => FPC(), disableMethod =() => NoFPC()},
                 new ButtonInfo { buttonText = "Steam Screenshot [RG]", isTogglable = true, method =() => Screenshot()},
 
                 new ButtonInfo { buttonText = "Toggle World Text", isTogglable = false, enableMethod =() => menuText = !menuText},
                 new ButtonInfo { buttonText = "InvisUI", isTogglable = true, enableMethod =() => menuBark = true, disableMethod =() => menuBark = false},
                 new ButtonInfo { buttonText = "Trigger Pages", isTogglable = true, enableMethod =() => triggerPages = true, disableMethod =() => triggerPages = false},
+                new ButtonInfo { buttonText = "Change Menu Theme", isTogglable = false, method =() => ChangeTheme()},
+                new ButtonInfo { buttonText = "Disable Menu Drop", isTogglable = true, enableMethod =() => menuDrop = false, disableMethod =() => menuDrop = true},
+                new ButtonInfo { buttonText = "Disable Outline", isTogglable = true, enableMethod =() => outlinedMenu = false, disableMethod =() => outlinedMenu = true},
+                new ButtonInfo { buttonText = "Rainbow Outline", isTogglable = true, enableMethod =() => rainbowOutline = true, disableMethod =() => rainbowOutline = false},
+                new ButtonInfo { buttonText = "Right Hand Menu", isTogglable = true, enableMethod =() => rightHanded = true, disableMethod =() => rightHanded = false},
 
                 new ButtonInfo { buttonText = "Speed Changer [Normal]", isTogglable = false, method =() => SpeedChanger()},
                 new ButtonInfo { buttonText = "Slide Changer [Normal]", isTogglable = false, method =() => SlideChanger()},
+                new ButtonInfo { buttonText = "Sticky Platforms", isTogglable = true, enableMethod =() => sticky = true, disableMethod =() => sticky = false},
 
                 new ButtonInfo { buttonText = "Uncap FPS", isTogglable = true, method =() => Application.targetFrameRate = 1000, disableMethod =() => Application.targetFrameRate = 144},
                 new ButtonInfo { buttonText = "Capped FPS [<color=lime>60</color>]", isTogglable = true, method =() => Application.targetFrameRate = 60, disableMethod =() => Application.targetFrameRate = 144},
@@ -104,12 +103,11 @@ namespace StupidTemplate.Menu
 
                 new ButtonInfo { buttonText = "testmod", isTogglable = false, method =() => NotifiLib.SendNotification(GorillaLocomotion.Player.Instance.transform.position.ToString())},
                 new ButtonInfo { buttonText = "testmod2", isTogglable = false, method =() => NotifiLib.SendNotification(GorillaLocomotion.Player.Instance.transform.rotation.ToString())},
-
-                /// [+] Notification Mods, [+] Theme Changers
             },
 
             new ButtonInfo[] { // [2] Current
-                new ButtonInfo { buttonText = "Get Server <color=lime>Ping</color>", isTogglable = false, method =() => NotifiLib.SendNotification($"PING: {PhotonNetwork.GetPing()}")},
+                new ButtonInfo { buttonText = "Server Information", isTogglable = false, method =() => NotifiLib.SendNotification(PhotonNetwork.InRoom ? $"PING: {PhotonNetwork.GetPing()}\nIP: {PhotonNetwork.ServerAddress}\nPlayercount: {PhotonNetwork.CountOfPlayers}\nServer's Time Elapsed: {PhotonNetwork.ServerTimestamp}" : "[<color=red>ERROR</color>] Not in room!")},
+                new ButtonInfo { buttonText = "Photon Information", isTogglable = false, method =() => NotifiLib.SendNotification($"Active Users: {PhotonNetwork.CountOfPlayersInRooms}")},
 
                 new ButtonInfo { buttonText = "Grab IDs", isTogglable = false, method =() => GetInfo()},
 
@@ -119,12 +117,12 @@ namespace StupidTemplate.Menu
 
                 new ButtonInfo { buttonText = "Create Private", isTogglable = false, method =() => Join(PrivateCode[UnityEngine.Random.Range(1, PrivateCode.Length)].ToUpper())},
 
-                new ButtonInfo { buttonText = "Bad Name Bypasser [DON'T CLICK ENTER]", isTogglable = true, method =() => BadNameBypasser()},
                 new ButtonInfo { buttonText = "Report Player [PC?]", isTogglable = true, enableMethod =() => EnableReportPlayer()},
 
-                new ButtonInfo { buttonText = "Disable Network Triggers", isTogglable = true, method =() => DisableNetworkTriggers(), disableMethod =() => EnableNetworkTriggers()},
+                new ButtonInfo { buttonText = "Disable Network Triggers", isTogglable = true, method =() => GameObject.Find("Environment Objects/TriggerZones_Prefab/JoinRoomTriggers_Prefab").SetActive(false), disableMethod =() => GameObject.Find("Environment Objects/TriggerZones_Prefab/JoinRoomTriggers_Prefab").SetActive(true)},
+                new ButtonInfo { buttonText = "Disable Quitbox", isTogglable = true, method =() => GameObject.Find("Environment Objects/TriggerZones_Prefab/ZoneTransitions_Prefab/QuitBox").SetActive(false), disableMethod =() => GameObject.Find("Environment Objects/TriggerZones_Prefab/ZoneTransitions_Prefab/QuitBox").SetActive(false)},
 
-                new ButtonInfo { buttonText = "Join Custom Menu Code", isTogglable = false, method =() => Join("RIFT___________________________________")},
+                new ButtonInfo { buttonText = "Join Custom Menu Code", isTogglable = false, method =() => Join("_RIFT_")},
                 new ButtonInfo { buttonText = "Join Ghost Code", isTogglable = false, method =() => Join(GhostCodes[UnityEngine.Random.Range(1, GhostCodes.Length)].ToUpper())},
                 new ButtonInfo { buttonText = "Join Youtube Code", isTogglable = false, method =() => Join(YoutubeCodes[UnityEngine.Random.Range(1, YoutubeCodes.Length)].ToUpper())},
                 new ButtonInfo { buttonText = "Join Comp Code", isTogglable = false, method =() => Join(CompCodes[UnityEngine.Random.Range(1, CompCodes.Length)].ToUpper())},
@@ -133,13 +131,9 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Switch Region [<color=lime>EU</color>]", isTogglable = false, method =() => PhotonNetwork.ConnectToRegion("eu")},
                 new ButtonInfo { buttonText = "Switch Region [<color=lime>AU</color>]", isTogglable = false, method =() => PhotonNetwork.ConnectToRegion("au")},
                 new ButtonInfo { buttonText = "Connect to Local Region", isTogglable = false, method =() => PhotonNetwork.ConnectToBestCloudServer()},
-
-                /// [+] Create Private, [+] [?] Create Public, [+] Improve Join Mods?
             },
 
-            new ButtonInfo[] { /*// [3] Miscellaneous [SCRAPPED FOR NOW]*/ new ButtonInfo { buttonText = "nothing here yet :)", isTogglable = false} },
-
-            new ButtonInfo[] { // [4] Fun
+            new ButtonInfo[] { // [3] Fun
                 new ButtonInfo { buttonText = "Splash", isTogglable = true, method =() => Splashing()},
                 new ButtonInfo { buttonText = "Splash <color=lime>Aura</color>", isTogglable = true, method =() => SplashAura()},
                 new ButtonInfo { buttonText = "Hit Player", isTogglable = true, method =() => HitPlayer()},
@@ -148,9 +142,6 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Spam Sounds [G]", isTogglable = true, method =() => SoundSpammer()},
                 new ButtonInfo { buttonText = "Spam Random Sounds [G]", isTogglable = true, method =() => SoundSpammer()},
                 new ButtonInfo { buttonText = "Spam When Touching", isTogglable = true, method =() => SpamWhenTouching()},
-
-                new ButtonInfo { buttonText = "Request Bug Owner", isTogglable = false, method =() => GetBugOwnership()},
-                new ButtonInfo { buttonText = "Teleport Bug", isTogglable = false, method =() => TeleportBug(GorillaTagger.Instance.headCollider.transform.position)},
 
                 new ButtonInfo { buttonText = "Leave Party", isTogglable = false, method =() => FriendshipGroupDetection.Instance.LeaveParty()},
 
@@ -162,20 +153,15 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Change Name [<color=lime>Uppercase</color>]", isTogglable = false, method =() => yourName().ToUpper()},
                 new ButtonInfo { buttonText = "Change Name [<color=lime>Separated</color>]", isTogglable = false, method =() => SeparateText(yourName())},
 
-                //new ButtonInfo { buttonText = "Loud <color=lime>Taps</color>", isTogglable = true, enableMethod =() => LoudTaps(), disableMethod =() => ResetTapVolume()},
-                //new ButtonInfo { buttonText = "Quiet <color=lime>Taps</color>", isTogglable = true, enableMethod =() => QuietTaps(), disableMethod =() => ResetTapVolume()},
-                new ButtonInfo { buttonText = "Fast <color=lime>Taps</color>", isTogglable = true, enableMethod =() => InfiniteTaps(), disableMethod =() => SlowTaps()},
-                //new ButtonInfo { buttonText = "Sneaky Tagger", isTogglable = true, method =() => },
+                new ButtonInfo { buttonText = "Fast Taps", isTogglable = true, enableMethod =() => InfiniteTaps(), disableMethod =() => SlowTaps()},
 
                 new ButtonInfo { buttonText = "Walk-on-Water", isTogglable = true, method =() => Jesus(), disableMethod =() => FixWater()},
                 new ButtonInfo { buttonText = "Disable Water", isTogglable = true, method =() => DisableWater(), disableMethod =() => EnableWater()},
-
-                /// [+] Spam Sound When Touching Anything, [+] Party Mods?, [+] Entity Mods, [+] Splash Mods, [+] Fix Tap Mods
             },
 
-            new ButtonInfo[] { // [5] Movement
-                new ButtonInfo { buttonText = "Platforms", isTogglable = true, method =() => Plattys(ButtonColor, false)},
-                new ButtonInfo { buttonText = "<color=lime>Trigger</color> Platforms", method =() => Plattys(ButtonColor, true)},
+            new ButtonInfo[] { // [4] Movement
+                new ButtonInfo { buttonText = "Platforms", isTogglable = true, method =() => Plattys(ButtonColor, rightG, leftG)},
+                new ButtonInfo { buttonText = "<color=lime>Trigger</color> Platforms", method =() => Plattys(ButtonColor, rightT > .2f, leftT > .2f)},
 
                 new ButtonInfo { buttonText = "Draw Platforms [G]", isTogglable = true, method =() => DrawPlatforms()},
                 new ButtonInfo { buttonText = "Draw Platform Gun", isTogglable = true, method =() => DrawPlatformsGun()},
@@ -201,10 +187,10 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Rig Gun", isTogglable = true, method =() => RigGun(), disableMethod =() => FixRig()},
 
                 new ButtonInfo { buttonText = "Spaz <color=lime>Body</color>", isTogglable = true, method =() => Spaz(), disableMethod =() => FixHead()},
-                new ButtonInfo { buttonText = "Spaz <color=lime>Head</color>", isTogglable = true, method =() => SpinHead(), disableMethod =() => FixHead()},
+                //new ButtonInfo { buttonText = "Spaz <color=lime>Head</color>", isTogglable = true, method =() => SpinHead(), disableMethod =() => FixHead()},
 
-                new ButtonInfo { buttonText = "Beyblade", isTogglable = true, method =() => Beyblade(), disableMethod =() => FixRig()},
                 new ButtonInfo { buttonText = "Helicopter", isTogglable = true, method =() => Helicopter(), disableMethod =() => FixRig()},
+                new ButtonInfo { buttonText = "Beyblade", isTogglable = true, method =() => Beyblade(), disableMethod =() => FixRig()},
 
                 new ButtonInfo { buttonText = "Key Movement", isTogglable = true, method =() => Keyboarding(), disableMethod =() => GorillaTagger.Instance.rigidbody.useGravity = true},
 
@@ -232,24 +218,10 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Zero Gravity", isTogglable = true, method =() => ZeroGravity()},
                 new ButtonInfo { buttonText = "Low Gravity", isTogglable = true, method =() => LowGravity()},
 
-                //new ButtonInfo { buttonText = "Stare At Closest", isTogglable = true, method =() => StareAtClosest()},
-
-                /*new ButtonInfo { buttonText = "Spin Head <color=lime>X</color>", isTogglable = true, method =() => SpinHeadX(), disableMethod =() => FixHead()},
-                new ButtonInfo { buttonText = "Spin Head <color=lime>Y</color>", isTogglable = true, method =() => SpinHeadY(), disableMethod =() => FixHead()},
-                new ButtonInfo { buttonText = "Spin Head <color=lime>Z</color>", isTogglable = true, method =() => SpinHeadZ(), disableMethod =() => FixHead()},
-
-                new ButtonInfo { buttonText = "Snap Head <color=lime>X</color>", isTogglable = true, method =() => SnapHeadX(), disableMethod =() => FixHead()},
-                new ButtonInfo { buttonText = "Snap Head <color=lime>Y</color>", isTogglable = true, method =() => SnapHeadY(), disableMethod =() => FixHead()},
-                new ButtonInfo { buttonText = "Snap Head <color=lime>Z</color>", isTogglable = true, method =() => SnapHeadZ(), disableMethod =() => FixHead()},
-
-                new ButtonInfo { buttonText = "Flip Head <color=lime>X</color>", isTogglable = true, method =() => FlipHeadX(), disableMethod =() => FixHead()},
-                new ButtonInfo { buttonText = "Flip Head <color=lime>Y</color>", isTogglable = true, method =() => FlipHeadY(), disableMethod =() => FixHead()},
-                new ButtonInfo { buttonText = "Flip Head <color=lime>Z</color>", isTogglable = true, method =() => FlipHeadZ(), disableMethod =() => FixHead()},*/
-
-                /// [+] Fix Teleporting, [+] Gun Mods, [+] Gravity Mods, [-] Remove Freecam, [+] [More Platform Settings, More Platform Mods]
+                new ButtonInfo { buttonText = "Fish Arms", isTogglable = true, method =() => FlipArms()},
             },
 
-            new ButtonInfo[] { // [6] Visuals
+            new ButtonInfo[] { // [5] Visuals
                 new ButtonInfo { buttonText = "Appear as Skeletons", isTogglable = true, enableMethod =() => ShowSkeletons(), disableMethod =() => HideSkeletons()},
 
                 new ButtonInfo { buttonText = "Disable Leaves", isTogglable = false, method =() => NoLeaves()},
@@ -300,19 +272,22 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Infection Speedometers", isTogglable = true, method =() => InfectionSpeedometer()},
                 new ButtonInfo { buttonText = "Competitive Speedometers", isTogglable = true, method =() => CompetitiveSpeedometer()},
 
+                new ButtonInfo { buttonText = "Nearest Target", isTogglable = true, method =() => NearestTarget()},
+
                 /// [+] Text Mods, [+] World Visual Mods
             },
 
-            new ButtonInfo[] { // [7] Advantages
+            new ButtonInfo[] { // [6] Advantages
                 new ButtonInfo { buttonText = "Tag <color=lime>Self</color>", isTogglable = true, method =() => TagSelf(), disableMethod =() => FixRig()},
                 new ButtonInfo { buttonText = "Tag <color=lime>All</color>", isTogglable = true, method =() => TagAll(), disableMethod =() => FixRig()},
+                new ButtonInfo { buttonText = "Tag <color=lime>All</color> [G]", isTogglable = true, method =() => GripTagAll(), disableMethod =() => FixRig()},
                 new ButtonInfo { buttonText = "Tag <color=lime>Aura</color>", isTogglable = true, method =() => TagAura(), disableMethod =() => FixRig()},
                 new ButtonInfo { buttonText = "Tag <color=lime>Gun</color>", isTogglable = true, method =() => TagGun(), disableMethod =() => FixRig()},
                 new ButtonInfo { buttonText = "Tag <color=lime>Flick</color>", isTogglable = true, method =() => FlickTag(), disableMethod =() => FixRig()},
-                new ButtonInfo { buttonText = "Tag <color=lime>Random</color> [<color=red>SPAM</color>]", isTogglable = false, method =() => TagRandom(), disableMethod =() => FixRig()},
+                new ButtonInfo { buttonText = "Tag <color=lime>Random</color> [G]", isTogglable = true, method =() => TagRandom(), disableMethod =() => FixRig()},
             },
 
-            new ButtonInfo[] { // [8] Safety
+            new ButtonInfo[] { // [7] Safety
                 new ButtonInfo { buttonText = "Flush RPCs", isTogglable = false, method =() => RPC_PATCHER_KICK_PATCHER()},
 
                 new ButtonInfo { buttonText = "Anti <color=grey>Report</color> [<color=lime>Disconnect</color>]", isTogglable = true, method =() => AntiReport(1)},
@@ -326,6 +301,8 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Spoof Name Ordinary", isTogglable = false, method =() => Name(simpleNames[UnityEngine.Random.Range(1, 100)].ToUpper())},
 
                 new ButtonInfo { buttonText = "Fake Quest Platform", isTogglable = false, method =() => QuestSupportTab()},
+
+                new ButtonInfo { buttonText = "Bad Name Bypasser [NO ENTER]", isTogglable = true, method =() => BadNameBypasser()},
             }
         };
     }
@@ -361,15 +338,36 @@ namespace StupidTemplate.Menu
                     else
                     {
                         Rigidbody rigid = menu.AddComponent(typeof(Rigidbody)) as Rigidbody;
-                        if (rightHanded)
-                            rigid.velocity = GorillaLocomotion.Player.Instance.rightHandCenterVelocityTracker.GetAverageVelocity(true, 0);
+                        if (menuDrop)
+                        {
+                            if (rightHanded)
+                                rigid.velocity = GorillaLocomotion.Player.Instance.rightHandCenterVelocityTracker.GetAverageVelocity(true, 0);
+                            else
+                                rigid.velocity = GorillaLocomotion.Player.Instance.leftHandCenterVelocityTracker.GetAverageVelocity(true, 0);
+                            rigid.AddTorque(new Vector3(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5)), ForceMode.Impulse);
+                            Destroy(menu, 3.25f);
+                            Destroy(reference);
+                            menu = null;
+                            reference = null;
+                        }
                         else
-                            rigid.velocity = GorillaLocomotion.Player.Instance.leftHandCenterVelocityTracker.GetAverageVelocity(true, 0);
-                        rigid.AddTorque(new Vector3(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5)), (ForceMode)1);
-                        Destroy(menu, 5);
-                        Destroy(reference);
-                        menu = null;
-                        reference = null;
+                        {
+                            rigid.useGravity = false;
+                            if (rightHanded)
+                                rigid.velocity = GorillaLocomotion.Player.Instance.rightHandCenterVelocityTracker.GetAverageVelocity(true, 0) * 0.5f;
+                            else
+                                rigid.velocity = GorillaLocomotion.Player.Instance.leftHandCenterVelocityTracker.GetAverageVelocity(true, 0) * 0.5f;
+                            rigid.AddTorque(new Vector3(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5)), ForceMode.Impulse);
+                            if (rigid != null)
+                            {
+                                rigid.AddForce(Vector3.up * 0.1f, ForceMode.Acceleration);
+                                rigid.velocity = Vector3.Lerp(rigid.velocity, Vector3.zero, Time.deltaTime * 0.5f);
+                            }
+                            Destroy(menu, 2.5f);
+                            Destroy(reference);
+                            menu = null;
+                            reference = null;
+                        }
                     }
                 }
             }
@@ -512,10 +510,29 @@ namespace StupidTemplate.Menu
                 {
                     DisclaimerText();
                 }
+
+                if (Vector3.Distance(GorillaTagger.Instance.transform.position, new Vector3(-65.01f, 12.63f, -80.57f)) < 1.5f)
+                {
+                    NewsText();
+                    NewsTitleText();
+                }
+
+                if (Vector3.Distance(GorillaTagger.Instance.transform.position, new Vector3(-67.12f, 12.58f, -80.30f)) < 1.85f)
+                {
+                    UsageText();
+                }
             }
             if (customBoard)
             {
                 UpdateBoards();
+            }
+            #endregion
+
+            #region Tag Self Prefix
+            if (GetIndex("Tag <color=lime>Self</color>").enabled && TaggedSelf)
+            {
+                GorillaTagger.Instance.offlineVRRig.enabled = true;
+                TaggedSelf = false;
             }
             #endregion
         }
@@ -539,24 +556,24 @@ namespace StupidTemplate.Menu
             text.transform.parent = canvasObject.transform;
             ConfigureText(text);
 
-            GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            gameObject.transform.parent = menu.transform;
-            ConfigureReturn(gameObject, canvasObject);
-            GameObject gameObject1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            gameObject1.transform.parent = menu.transform;
-            ConfigureDisconnect(gameObject1, canvasObject);
-            GameObject gameObject2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            gameObject2.transform.parent = menu.transform;
-            ConfigureHopConfigureRightPage(gameObject2, canvasObject);
-            GameObject gameObject3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            gameObject3.transform.parent = menu.transform;
-            ConfigureFPSConfigureLeftPage(gameObject3, canvasObject);
-            GameObject gameObject4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            gameObject4.transform.parent = menu.transform;
-            ConfigureDiscord(gameObject4, canvasObject);
-            GameObject gameObject5 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            gameObject5.transform.parent = menu.transform;
-            ConfigurePanic(gameObject5, canvasObject);
+            GameObject Return = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Return.transform.parent = menu.transform;
+            ConfigureReturn(Return, canvasObject);
+            GameObject Disconnect = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Disconnect.transform.parent = menu.transform;
+            ConfigureDisconnect(Disconnect, canvasObject);
+            GameObject Serverhop = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Serverhop.transform.parent = menu.transform;
+            ConfigureHopConfigureRightPage(Serverhop, canvasObject);
+            GameObject FPS = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            FPS.transform.parent = menu.transform;
+            ConfigureFPSConfigureLeftPage(FPS, canvasObject);
+            GameObject Discord = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Discord.transform.parent = menu.transform;
+            ConfigureDiscord(Discord, canvasObject);
+            GameObject Panic = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Panic.transform.parent = menu.transform;
+            ConfigurePanic(Panic, canvasObject);
 
             for (int i = 0; i < Enumerable.ToArray<ButtonInfo>(Enumerable.Take<ButtonInfo>(Enumerable.Skip<ButtonInfo>(Buttons.buttons[buttonsType], pageNumber * buttonsPerPage), buttonsPerPage)).Length; i++)
             {
@@ -625,8 +642,8 @@ namespace StupidTemplate.Menu
             memorymesh.anchor = TextAnchor.MiddleCenter;
             memorymesh.alignment = TextAlignment.Center;
             memorymesh.color = Color.white;
-            mymemorymymemory.transform.position = new Vector3(-54.23f, 17.4f, -105.80f);
-            memorymesh.text = $"Beta Testers\n\nconstantsans\nikoniccodes\ncyx4\nchip124_2\nitsmonkeyz_\npsychothinker.\n";
+            mymemorymymemory.transform.position = new Vector3(-54.23f, 17.58f, -105.80f);
+            memorymesh.text = $"Testers\nconstantsans, ikoniccodes, cyx4,\nchip124_2, itsmonkeyz_, psychothinker, calixlala";
             mymemorymymemory.transform.LookAt(Camera.main.transform.position);
             mymemorymymemory.transform.Rotate(0, 180, 0);
             Destroy(mymemorymymemory, Time.deltaTime);
@@ -649,6 +666,57 @@ namespace StupidTemplate.Menu
             Destroy(mymemorymymemory, Time.deltaTime);
         }
 
+        public static void NewsTitleText()
+        {
+            GameObject mymemorymymemory = new GameObject("wdwadawdawddawdwawadadawdawd");
+            TextMesh memorymesh = mymemorymymemory.AddComponent<TextMesh>();
+            memorymesh.fontSize = 100;
+            memorymesh.fontStyle = FontStyle.Italic;
+            memorymesh.characterSize = 0.007f;
+            memorymesh.anchor = TextAnchor.MiddleCenter;
+            memorymesh.alignment = TextAlignment.Center;
+            memorymesh.color = Color.white;
+            mymemorymymemory.transform.position = new Vector3(-65.01f, 12.805f, -80.57f);
+            memorymesh.text = "<color=red>NEWS</color>";
+            mymemorymymemory.transform.LookAt(Camera.main.transform.position);
+            mymemorymymemory.transform.Rotate(0, 180, 0);
+            Destroy(mymemorymymemory, Time.deltaTime);
+        }
+
+        public static void NewsText()
+        {
+            GameObject mymemorymymemory = new GameObject("wdwadawdawddawdwawadadawdawd");
+            TextMesh memorymesh = mymemorymymemory.AddComponent<TextMesh>();
+            memorymesh.fontSize = 100;
+            memorymesh.fontStyle = FontStyle.Italic;
+            memorymesh.characterSize = 0.005f;
+            memorymesh.anchor = TextAnchor.MiddleCenter;
+            memorymesh.alignment = TextAlignment.Center;
+            memorymesh.color = Color.white;
+            mymemorymymemory.transform.position = new Vector3(-65.01f, 12.63f, -80.57f);
+            memorymesh.text = news;
+            mymemorymymemory.transform.LookAt(Camera.main.transform.position);
+            mymemorymymemory.transform.Rotate(0, 180, 0);
+            Destroy(mymemorymymemory, Time.deltaTime);
+        }
+
+        public static void UsageText()
+        {
+            GameObject mymemorymymemory = new GameObject("wdwadawdawddawdwawadadawdawd");
+            TextMesh memorymesh = mymemorymymemory.AddComponent<TextMesh>();
+            memorymesh.fontSize = 100;
+            memorymesh.fontStyle = FontStyle.Bold;
+            memorymesh.characterSize = 0.005f;
+            memorymesh.anchor = TextAnchor.MiddleCenter;
+            memorymesh.alignment = TextAlignment.Left;
+            memorymesh.color = Color.white;
+            mymemorymymemory.transform.position = new Vector3(-67.12f, 12.58f, -80.30f);
+            memorymesh.text = "[R] Opens menu on PC\n[Y] Opens menu on VR\n[F3] Opens Room Manager on PC";
+            mymemorymymemory.transform.LookAt(Camera.main.transform.position);
+            mymemorymymemory.transform.Rotate(0, 180, 0);
+            Destroy(mymemorymymemory, Time.deltaTime);
+        }
+
         public static void UpdateBoards()
         {
             for (int i = 0; i < TreeRoom.transform.childCount; i++)
@@ -664,10 +732,10 @@ namespace StupidTemplate.Menu
             MessageDayText.alignment = TextAlignmentOptions.Top;
             MessageDayText.text = $"{DateTime.Now:hh:mm tt}\nFrom 6/18/24 to {DateTime.Now:MM/dd/yy}, <color=red>Disclaimer</color>:\nOur mod menu is designed to be fully undetected (UD), open sourced and regularly updated for safety. However, we are not responsible for any bans or reports resulting from its use. By using <color=grey>{PluginInfo.Name}</color>, you accept full responsibility for anything that happens.\n\n\n\nTime Elasped: {Time.time.ToString("F1")}\nhttps://discord.gg/NsSwxqg8D2";
 
-            CodeOfConductTitle.text = $"";
+            CodeOfConductTitle.text = MENUSTATUS;
             CodeOfConductText.text = coc;
         }
-        /*Doesn't load but I like the pink gradient!!! [is this local?]*/public static Material boardmat = TextureLoader("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vectors%2Fblack-sky-stars-vectors&psig=AOvVaw2psVbQ5FdykIuhtLsQlFm2&ust=1728403997160000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDgw-TU_IgDFQAAAAAdAAAAABAE");
+        public static Material boardmat = TextureLoader("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vectors%2Fblack-sky-stars-vectors&psig=AOvVaw2psVbQ5FdykIuhtLsQlFm2&ust=1728403997160000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDgw-TU_IgDFQAAAAAdAAAAABAE");
 
         public static string configuringRoomCode()
         {
@@ -694,7 +762,7 @@ namespace StupidTemplate.Menu
             if (i == 1) value = target.playerColor.r;
             if (i == 2) value = target.playerColor.g;
             if (i == 3) value = target.playerColor.b;
-            return Mathf.Clamp(Mathf.RoundToInt(value * 9), 1, 9).ToString();
+            return Mathf.Clamp(Mathf.RoundToInt(value * 9), 0, 9).ToString();
         }
 
         public static int GetModCount()
@@ -705,9 +773,9 @@ namespace StupidTemplate.Menu
         public static void ConfigureText(Text text)
         {
             text.font = currentFont;
-            text.text = PluginInfo.Name + " " + (Main.pageNumber + 1).ToString();
-            text.fontSize = 1;
-            text.color = Color.white;
+            text.text = PluginInfo.Name;
+            text.fontSize = 1000;
+            text.color = TitleColor;
             text.supportRichText = true;
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.fontStyle = FontStyle.Italic;
@@ -717,8 +785,8 @@ namespace StupidTemplate.Menu
 
             RectTransform component = text.GetComponent<RectTransform>();
             component.localPosition = Vector3.zero;
-            component.sizeDelta = new Vector2(.05f, .01f);
-            component.position = new Vector3(0.055f, 0f, 0.15f);
+            component.sizeDelta = new Vector2(.058f, .018f);
+            component.position = new Vector3(0.052f, 0f, 0.1535f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
         }
 
@@ -734,21 +802,30 @@ namespace StupidTemplate.Menu
         {
             background.transform.rotation = Quaternion.identity;
             background.transform.localScale = menuSize;
-            if (buttonsToo)
-            {
-                Main.button.GetComponent<Renderer>().material.color = new Color32(50, 50, 50, 255);
-                Main.HomeButton.GetComponent<Renderer>().material.color = new Color32(50, 50, 50, 255);
-            }
-            background.GetComponent<Renderer>().material.color = new Color32(20, 20, 20, 255);
+            if (buttonsToo) { }
+            background.GetComponent<Renderer>().material.color = MenuColor;
             if (menuBark)
             {
-                background.transform.position = GorillaTagger.Instance.headCollider.transform.position + new Vector3(-1.45f, 0, 0);
+                background.transform.position = new Vector3(999, 999, 999);
             }
             else
             {
                 background.transform.position = new Vector3(0.45f, 0f, 0f);
             }
             menu.transform.localScale = new Vector3(0.1f, 0.28f, 0.34f);
+
+            if (outlinedMenu && !menuBark)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = background.transform.position;
+                outline.transform.rotation = background.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.09f, 1.01f, 1.01f);
+            }
         }
 
         public static void ConfigureButtons(float offset, ButtonInfo method)
@@ -784,11 +861,11 @@ namespace StupidTemplate.Menu
             text.fontSize = 1;
             if (method.enabled)
             {
-                text.color = Color.blue;
+                text.color = EnabledTextColor;
             }
             else
             {
-                text.color = Color.white;
+                text.color = TextColor;
             }
             text.alignment = TextAnchor.MiddleCenter;
             text.fontStyle = FontStyle.Italic;
@@ -799,6 +876,19 @@ namespace StupidTemplate.Menu
             component.sizeDelta = new Vector2(.15f, .02f);
             component.localPosition = new Vector3(.058f, 0, .111f - offset / 3 + 0.009f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+
+            if (outlinedMenu)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = button.transform.position;
+                outline.transform.rotation = button.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.045f, 0.885f, 0.11169f);
+            }
         }
 
         public static void ConfigureReturn(GameObject HomeButton, GameObject canvasObject)
@@ -819,7 +909,8 @@ namespace StupidTemplate.Menu
             Text text = new GameObject { transform = { parent = canvasObject.transform } }.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.text = "⌂"; // ⌂ ⇦
-            text.fontSize = 1;
+            text.color = TextColor;
+            text.fontSize = 1000;
             text.alignment = TextAnchor.MiddleCenter;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 0;
@@ -828,6 +919,19 @@ namespace StupidTemplate.Menu
             component.sizeDelta = new Vector2(0.11f, 0.03f) * GorillaLocomotion.Player.Instance.scale;
             component.localPosition = new Vector3(0.0493f, HomeButton.transform.localPosition.y / 3.59f, 0.118f - 0.84f / 2.55f + 0.023f/*0.021*/);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+
+            if (outlinedMenu)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = HomeButton.transform.position;
+                outline.transform.rotation = HomeButton.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.08f, 0.113f, 0.094f);
+            }
         }
 
         public static void ConfigureDisconnect(GameObject LeaveButton, GameObject canvasObject)
@@ -842,7 +946,8 @@ namespace StupidTemplate.Menu
             Text text = new GameObject { transform = { parent = canvasObject.transform } }.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.text = "Leave";
-            text.fontSize = 1;
+            text.color = TextColor;
+            text.fontSize = 1000;
             text.alignment = TextAnchor.MiddleCenter;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 0;
@@ -851,6 +956,19 @@ namespace StupidTemplate.Menu
             component.sizeDelta = new Vector2(0.07f, 0.014f);
             component.localPosition = new Vector3(0.0493f, LeaveButton.transform.localPosition.y / 3.59f, 0.118f - 0.84f / 2.55f + 0.0222f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+
+            if (outlinedMenu)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = LeaveButton.transform.position;
+                outline.transform.rotation = LeaveButton.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.08f, 0.214f, 0.095f);
+            }
         }
 
         public static void ConfigureHopConfigureRightPage(GameObject HopButton, GameObject canvasObject)
@@ -865,7 +983,8 @@ namespace StupidTemplate.Menu
             Text text = new GameObject { transform = { parent = canvasObject.transform } }.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.text = !triggerPages ? ">" : "Hop";
-            text.fontSize = 1;
+            text.color = TextColor;
+            text.fontSize = 1000;
             text.alignment = TextAnchor.MiddleCenter;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 0;
@@ -874,6 +993,19 @@ namespace StupidTemplate.Menu
             component.sizeDelta = !triggerPages ? new Vector2(.1f, .02f) : new Vector2(0.07f, 0.014f);
             component.localPosition = new Vector3(0.0493f, HopButton.transform.localPosition.y / 3.59f, 0.118f - 0.84f / 2.55f + 0.021f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+
+            if (outlinedMenu)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = HopButton.transform.position;
+                outline.transform.rotation = HopButton.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.08f, 0.163f, 0.094f);
+            }
         }
 
         public static void ConfigureFPSConfigureLeftPage(GameObject FPSButton, GameObject canvasObject)
@@ -898,7 +1030,8 @@ namespace StupidTemplate.Menu
             Text text = new GameObject { transform = { parent = canvasObject.transform } }.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.text = !triggerPages ? "<" : Mathf.Ceil(1f / Time.unscaledDeltaTime).ToString();
-            text.fontSize = 1;
+            text.color = TextColor;
+            text.fontSize = 1000;
             text.alignment = TextAnchor.MiddleCenter;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 0;
@@ -907,6 +1040,19 @@ namespace StupidTemplate.Menu
             component.sizeDelta = !triggerPages ? new Vector2(.1f, .02f) : new Vector2(0.07f, 0.014f);
             component.localPosition = new Vector3(0.0493f, FPSButton.transform.localPosition.y / 3.59f, 0.118f - 0.84f / 2.55f + 0.021f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+
+            if (outlinedMenu)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = FPSButton.transform.position;
+                outline.transform.rotation = FPSButton.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.08f, 0.163f, 0.094f);
+            }
         }
 
         public static void ConfigurePanic(GameObject HomeButton, GameObject canvasObject)
@@ -921,7 +1067,8 @@ namespace StupidTemplate.Menu
             Text text = new GameObject { transform = { parent = canvasObject.transform } }.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.text = "Panic";
-            text.fontSize = 1;
+            text.color = TextColor;
+            text.fontSize = 1000;
             text.alignment = TextAnchor.MiddleCenter;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 0;
@@ -930,6 +1077,19 @@ namespace StupidTemplate.Menu
             component.sizeDelta = new Vector2(0.07f, 0.014f) * GorillaLocomotion.Player.Instance.scale;
             component.localPosition = new Vector3(0.0493f, HomeButton.transform.localPosition.y / 3.59f, 0.118f - 0.84f / 2.55f + 0.021f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+
+            if (outlinedMenu)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = HomeButton.transform.position;
+                outline.transform.rotation = HomeButton.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.08f, 0.153f, 0.094f);
+            }
         }
 
         public static void ConfigureDiscord(GameObject HomeButton, GameObject canvasObject)
@@ -944,7 +1104,8 @@ namespace StupidTemplate.Menu
             Text text = new GameObject { transform = { parent = canvasObject.transform } }.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.text = "★";
-            text.fontSize = 1;
+            text.color = TextColor;
+            text.fontSize = 1000;
             text.alignment = TextAnchor.MiddleCenter;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 0;
@@ -953,6 +1114,19 @@ namespace StupidTemplate.Menu
             component.sizeDelta = new Vector2(0.11f, 0.03f) * GorillaLocomotion.Player.Instance.scale;
             component.localPosition = new Vector3(0.0493f, HomeButton.transform.localPosition.y / 3.59f, 0.118f - 0.84f / 2.55f + 0.021f);
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+
+            if (outlinedMenu)
+            {
+                GameObject outline = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(outline.GetComponent<Collider>());
+                outline.transform.parent = menu.transform;
+                outline.transform.position = HomeButton.transform.position;
+                outline.transform.rotation = HomeButton.transform.rotation;
+                ColorChanger colorChanger = outline.AddComponent<ColorChanger>();
+                colorChanger.colorInfo = rainbowOutline ? backgroundColor : backgroundColor1;
+                colorChanger.Start();
+                outline.transform.localScale = new Vector3(0.08f, 0.113f, 0.094f);
+            }
         }
 
         public static void RecreateMenu()
@@ -1115,6 +1289,7 @@ namespace StupidTemplate.Menu
             if (buttonText == "_discord_")
             {
                 Process.Start("https://discord.gg/NsSwxqg8D2");
+                Process.Start("https://github.com/Fevps/Rift");
             }
             if (buttonText == "_panic_")
             {
@@ -1178,8 +1353,6 @@ namespace StupidTemplate.Menu
         public static GameObject HomeButton;
 
         public static SphereCollider buttonCollider;
-        public static Camera TPC;
-        public static Text fpsObject;
 
         public static int pageNumber = 0;
         public static int buttonsType = 0;
@@ -1187,36 +1360,21 @@ namespace StupidTemplate.Menu
         public static float j = 0f;
         public static float k = 0.2f;
 
-        public static string[] activeMods = new string[] { };
-
         public static bool InCategory = false;
-
-        public static bool rightGun = true;
-        public static bool lockGun = false;
 
         public static VRRig copyrig = null;
 
         public static string RoomCode;
 
-        public static bool boardBool = false;
-        public static bool active = false;
-
-        public static bool BUTTONCOLORS = false;
-
         public static int SavePage;
         public static bool ResetToDefault;
 
-        public static int index = UnityEngine.Random.Range(1, 99);
-        public static int index1 = UnityEngine.Random.Range(1, 99);
-        public static int index2 = UnityEngine.Random.Range(1, 99);
-        public static int index3 = UnityEngine.Random.Range(1, 99);
-
-        public static bool usingSlip = false;
-        public static bool usingGrip = false;
-
         public static bool menuBark = false;
+        public static bool menuDrop = true;
 
         public static bool triggerPages = false;
+        public static bool outlinedMenu = true;
+        public static bool rainbowOutline = false;
 
         public static bool menuText = true;
         public static bool customBoard = true;
@@ -1227,39 +1385,15 @@ namespace StupidTemplate.Menu
         public static TMP_Text MessageDayText = GameObject.Find("motdtext").GetComponent<TMP_Text>();
         public static TMP_Text MessageDayTitle = GameObject.Find("motd (1)").GetComponent<TMP_Text>();
 
-        public static Vector3 position;
-        public static Vector3 instance_;
-
-        public static VRRig chosenPLayer = null;
-
-        public static RaycastHit raycast;
-
-        public static VRRig LockedPlayer = null;
-
-        public static Color32 disabledColor = new Color32(255, 10, 10, 255);
-        public static Color32 enabledColor = new Color32(10, 255, 10, 255);
-
-        public static Color32 MenuColor;
+        public static Color32 MenuColor = new Color32(20, 20, 20, 1);
         public static Color32 ButtonColor = new Color32(50, 50, 50, 1);
         public static Color32 EnabledColor = new Color32(20, 20, 20, 1);
+        public static Color32 TextColor = Color.white;
+        public static Color32 EnabledTextColor = Color.red;
+        public static Color32 TitleColor = Color.white;
 
         public static Color red = new Color32(255, 0, 0, 255);
         public static Color green = new Color32(0, 255, 0, 255);
-
-        public static bool Q = UnityInput.Current.GetKey(KeyCode.Q);
-        public static bool W = UnityInput.Current.GetKey(KeyCode.W);
-        public static bool E = UnityInput.Current.GetKey(KeyCode.E);
-        public static bool R = UnityInput.Current.GetKey(KeyCode.R);
-        public static bool T = UnityInput.Current.GetKey(KeyCode.T);
-        public static bool A = UnityInput.Current.GetKey(KeyCode.A);
-        public static bool S = UnityInput.Current.GetKey(KeyCode.S);
-        public static bool D = UnityInput.Current.GetKey(KeyCode.D);
-        public static bool F = UnityInput.Current.GetKey(KeyCode.F);
-        public static bool G = UnityInput.Current.GetKey(KeyCode.G);
-        public static bool Z = UnityInput.Current.GetKey(KeyCode.Z);
-        public static bool X = UnityInput.Current.GetKey(KeyCode.X);
-        public static bool C = UnityInput.Current.GetKey(KeyCode.C);
-        public static bool V = UnityInput.Current.GetKey(KeyCode.V);
 
         public static float rightT = ControllerInputPoller.TriggerFloat(XRNode.RightHand);
         public static Vector2 rjs = ControllerInputPoller.instance.rightControllerPrimary2DAxis;
@@ -1314,28 +1448,52 @@ namespace StupidTemplate.Menu
             "Chris", "Johnny", "Earl", "Jimmy", "Antonio", "Danny", "Bryan", "Tony"
         };
 
-	    public static GameObject forest = GameObject.Find("Environment Objects/LocalObjects_Prefab/Forest");
-        public static GameObject city = GameObject.Find("Environment Objects/LocalObjects_Prefab/City");
-        public static GameObject canyon = GameObject.Find("Environment Objects/LocalObjects_Prefab/Canyon");
-        public static GameObject cave = GameObject.Find("Environment Objects/LocalObjects_Prefab/Cave_Main_Prefab");
-        public static GameObject mountain = GameObject.Find("Environment Objects/LocalObjects_Prefab/Mountain");
-        public static GameObject clouds = GameObject.Find("Environment Objects/LocalObjects_Prefab/skyjungle");
-        public static GameObject cloudsbottom = GameObject.Find("Environment Objects/LocalObjects_Prefab/Forest/Sky Jungle Bottom (1)/CloudSmall (22)");
-        public static GameObject beach = GameObject.Find("Environment Objects/LocalObjects_Prefab/Beach");
-        public static GameObject beachthing = GameObject.Find("Environment Objects/LocalObjects_Prefab/ForestToBeach");
-        public static GameObject basement = GameObject.Find("Environment Objects/LocalObjects_Prefab/Basement");
+	    public static GameObject Forest = GameObject.Find("Environment Objects/LocalObjects_Prefab/Forest");
+        public static GameObject City = GameObject.Find("Environment Objects/LocalObjects_Prefab/City");
+        public static GameObject Canyon = GameObject.Find("Environment Objects/LocalObjects_Prefab/Canyon");
+        public static GameObject Cave = GameObject.Find("Environment Objects/LocalObjects_Prefab/Cave_Main_Prefab");
+        public static GameObject Mountain = GameObject.Find("Environment Objects/LocalObjects_Prefab/Mountain");
+        public static GameObject Clouds = GameObject.Find("Environment Objects/LocalObjects_Prefab/skyjungle");
+        //public static GameObject CloudsBottom = GameObject.Find("Environment Objects/LocalObjects_Prefab/Forest/Sky Jungle Bottom (1)/CloudSmall (22)");
+        public static GameObject Beach = GameObject.Find("Environment Objects/LocalObjects_Prefab/Beach");
+        //public static GameObject BeachThing = GameObject.Find("Environment Objects/LocalObjects_Prefab/ForestToBeach");
+        public static GameObject Basement = GameObject.Find("Environment Objects/LocalObjects_Prefab/Basement");
 
         public static string[] PrivateCode = new string[] { "6825", "9866", "1095", "9582", "0969", "7969", "1245", "1059", "2589", "2308", "0966", "3095", "2395" };
 
-        public static string coc = "Free use, competitive, frequent updates, high fps, customizable menu, Rift.";
+        public static string coc = $"Free use, competitive, frequent updates, high fps, customizable menu, Rift.\n\n\n\n\n\n\n\n\n\n\n\n\n     https://github.com/Fevps/Rift";
+        public static string news = "We are very excited to tell you guys 2.0.0 is coming sooner than expected,\nyou guys are expected to get the 2.0.0 update before 11/30/24!\n\nThank you all for the support.";
 
         public static string MENUSTATUS = "UNDETECTED";
-        public static string GITHUBSTATUS = "https://github.com/Fevps/Rift";
-
-        public static int[] gptmadethesebonesforme = new int[] { 1, 3, 5, 4, 19, 18, 20, 19, 3, 18, 29, 21, 31, 29, 27, 25, 24, 22, 6, 5, 7, 6, 10, 6, 14, 6, 16, 14, 12, 10, 9, 7 };
 
         public static GameObject GunPointer = null;
         public static GameObject GunTracer = null;
         public static RaycastHit GunHit;
+        public static bool isLocking = false;
+        public static VRRig copyingRig = null;
+
+        public static bool arrayTrue = true;
+        public static bool guibld = true;
+        public static bool GUIEnabled = true;
+        public static int wrigj4wgj = 0;
+
+        public static GameObject gameobject = null;
+
+        public static Vector3 originalPos;
+        public static Quaternion originalRot;
+        public static float originalFoV;
+        public static GameObject tpc = GameObject.Find("Shoulder Camera");
+        public static Camera TPC = tpc.GetComponent<Camera>();
+
+        public static float jumpMultiplier = 6.5f;
+        public static float jumpSpeed = 1.1f;
+        public static int jumpCount = 1;
+        public static int slideCount;
+        public static float slideControl = 1;
+        public static int chosenSound = 66;
+        public static int platCount = 1;
+        public static bool rplatEnabled = false;
+        public static bool lplatEnabled = false;
+        public static bool sticky = false;
     }
 }
